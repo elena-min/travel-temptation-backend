@@ -4,7 +4,8 @@
 # isolated from any previous builds.
 
 variables:
-GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  
 stages:
   - build
   - test
