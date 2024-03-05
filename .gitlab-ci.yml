@@ -13,7 +13,7 @@ stages:
 build:
   stage: build
   script:
-    - ./gradlew assemble
+    - IndivdualAS3\gradlew assemble
 
 test:
   stage: test
