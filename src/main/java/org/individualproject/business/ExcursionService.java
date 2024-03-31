@@ -2,6 +2,7 @@ package org.individualproject.business;
 
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
+import org.individualproject.domain.UpdateExcursionRequest;
 import org.individualproject.persistence.ExcursionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class ExcursionService {
         return excursions;
     }
     public Optional<Excursion> getExcursion(Integer id) {
-        return Optional.ofNullable(excursionRepository.getExcursion(id));
+        return excursionRepository.getExcursion(id);
     }
 
     public Long createExcursion(CreateExcursionRequest request){
@@ -35,6 +36,28 @@ public class ExcursionService {
                 .price(request.getPrice())
                 .build();
         return  excursionRepository.createExcursion(newExcursion);
+    }
+
+    public boolean deleteExcursion(Integer id){
+        return excursionRepository.deleteExcursion(id);
+    }
+
+    public boolean updateExcursion(UpdateExcursionRequest request) {
+        Optional<Excursion> optionalExcursion = excursionRepository.getExcursion(request.getId());
+        if(optionalExcursion.isPresent()){
+            Excursion existingExcursion = optionalExcursion.get();
+            existingExcursion.setName(request.getName());
+            existingExcursion.setDestinations(request.getDestinations());
+            existingExcursion.setStartDate(request.getStartDate());
+            existingExcursion.setEndDate(request.getEndDate());
+            existingExcursion.setTravelAgency(request.getTravelAgency());
+            existingExcursion.setPrice(request.getPrice());
+            return excursionRepository.updateExcursion(existingExcursion);
+
+        }
+        else {
+            return false;
+        }
     }
 
 }

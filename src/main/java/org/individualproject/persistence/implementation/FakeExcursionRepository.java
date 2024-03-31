@@ -53,12 +53,11 @@ public class FakeExcursionRepository implements ExcursionRepository {
     }
 
     @Override
-    public Excursion getExcursion(long excursionID) {
+    public Optional<Excursion> getExcursion(long excursionID) {
         return this.excursions
                 .stream() //converts the list into a stream
                 .filter(excursion -> excursion.getId() == excursionID)
-                .findFirst()// returns the first element of the stream
-                .orElse(null);// if there is no result, it's going to return null
+                .findFirst();
     }
 
     @Override
@@ -72,8 +71,34 @@ public class FakeExcursionRepository implements ExcursionRepository {
         nextId++;
         excursions.add(newExcursion);
         return newExcursion.getId();
-
-
-
     }
+
+    @Override
+    public boolean deleteExcursion(long excursionID){
+        Excursion excursionToRemove = null;
+        for(Excursion excursion : excursions) {
+            if (excursion.getId() == excursionID) {
+                excursionToRemove = excursion;
+                break;
+            }
+        }
+         if(excursionToRemove != null){
+             excursions.remove(excursionToRemove);
+             return true;
+         }
+        return false;
+    }
+
+    @Override
+    public boolean updateExcursion(Excursion excursionToUpdate){
+        for(Excursion excursion : excursions) {
+            if (excursion.getId() == excursionToUpdate.getId()) {
+                int index = excursions.indexOf(excursion);
+                excursions.set(index, excursionToUpdate);
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

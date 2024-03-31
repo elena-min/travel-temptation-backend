@@ -4,12 +4,14 @@ import jakarta.validation.Valid;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
+import org.individualproject.domain.UpdateExcursionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.lang.Long;
 
 @RestController
 @RequestMapping("/excursions")
@@ -31,7 +33,7 @@ public class ExcursionsController {
     }
 
     @GetMapping()
-    public List<Excursion>  getExcursions()
+    public List<Excursion> getExcursions()
     {
         return excursionService.getExcursions();
     }
@@ -40,5 +42,22 @@ public class ExcursionsController {
         public ResponseEntity<Long> createExcursion(@RequestBody @Valid CreateExcursionRequest request) {
         Long response = excursionService.createExcursion(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Long> deleteExcursion(@PathVariable(value = "id") final Integer id)
+    {
+        if (excursionService.deleteExcursion(id)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateExcursionRequest request){
+
+        request.setId(id);
+        excursionService.updateExcursion(request);
+        return ResponseEntity.noContent().build();
     }
 }
