@@ -101,4 +101,12 @@ public class FakeExcursionRepository implements ExcursionRepository {
         return false;
     }
 
+    @Override
+    public Optional<Excursion> getExcursionByName(String excursionName) {
+        return this.excursions
+                .stream() //converts the list into a stream
+                .filter(excursion -> excursion.getName().equals(excursionName))
+                .findFirst();
+    }
+
 }

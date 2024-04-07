@@ -60,4 +60,9 @@ public class ExcursionService {
         }
     }
 
+    public Optional<Excursion> getExcursionByName(String name){
+        return excursionRepository.getExcursionByName(name);
+
+    }
+
 }

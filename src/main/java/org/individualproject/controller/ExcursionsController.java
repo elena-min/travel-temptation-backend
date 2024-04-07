@@ -60,4 +60,16 @@ public class ExcursionsController {
         excursionService.updateExcursion(request);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{name}")
+    public Excursion getExcursionByName(@PathVariable(value = "name") final String name)
+    {
+        final Optional<Excursion> excursionOptional = excursionService.getExcursionByName(name);
+        if (excursionOptional.isPresent()) {
+            return excursionOptional.get();
+        }
+        return null;
+    }
+
+
 }

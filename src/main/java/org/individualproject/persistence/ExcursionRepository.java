@@ -13,6 +13,8 @@ public interface ExcursionRepository {
     boolean deleteExcursion(long excursionID);
 
     boolean updateExcursion(Excursion excursionToUpdate);
+    Optional<Excursion> getExcursionByName(String excursionName);
+
 
 
 
