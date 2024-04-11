@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 
 @Repository
-public class FakeExcursionRepository implements ExcursionRepository {
+public class FakeExcursionRepository  {
     private final List<Excursion> excursions;
     private Excursion excursion1;
     private Excursion excursion2;
@@ -52,7 +52,7 @@ public class FakeExcursionRepository implements ExcursionRepository {
         excursions.add(excursion3);
     }
 
-    @Override
+
     public Optional<Excursion> getExcursion(long excursionID) {
         return this.excursions
                 .stream() //converts the list into a stream
@@ -60,12 +60,10 @@ public class FakeExcursionRepository implements ExcursionRepository {
                 .findFirst();
     }
 
-    @Override
     public List<Excursion> getExcursions() {
         return Collections.unmodifiableList(excursions);
     }
 
-    @Override
     public Long createExcursion(Excursion newExcursion) {
         newExcursion.setId(nextId);
         nextId++;
@@ -73,7 +71,6 @@ public class FakeExcursionRepository implements ExcursionRepository {
         return newExcursion.getId();
     }
 
-    @Override
     public boolean deleteExcursion(long excursionID){
         Excursion excursionToRemove = null;
         for(Excursion excursion : excursions) {
@@ -89,7 +86,6 @@ public class FakeExcursionRepository implements ExcursionRepository {
         return false;
     }
 
-    @Override
     public boolean updateExcursion(Excursion excursionToUpdate){
         for(Excursion excursion : excursions) {
             if (excursion.getId() == excursionToUpdate.getId()) {
@@ -101,7 +97,7 @@ public class FakeExcursionRepository implements ExcursionRepository {
         return false;
     }
 
-    @Override
+
     public Optional<Excursion> getExcursionByName(String excursionName) {
         return this.excursions
                 .stream() //converts the list into a stream

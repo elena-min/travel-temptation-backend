@@ -81,7 +81,7 @@ class ExcursionServiceTest {
                         "Adventure Tours",
                         1500.0
                 );
-        when(excursionRepository.getExcursion(1)).thenReturn(fakeExcursion);
+        when(excursionRepository.getExcursion(1)).thenReturn(Optional.of(fakeExcursion));
         // Act
         Optional<Excursion> result = excursionService.getExcursion(1);
 

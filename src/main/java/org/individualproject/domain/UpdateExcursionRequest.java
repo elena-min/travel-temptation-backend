@@ -25,12 +25,10 @@ public class UpdateExcursionRequest {
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
     private Date startDate;
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
     private Date endDate;
 
     @NotBlank

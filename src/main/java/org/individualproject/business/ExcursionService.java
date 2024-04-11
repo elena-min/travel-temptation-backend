@@ -4,7 +4,9 @@ import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
 import org.individualproject.persistence.ExcursionRepository;
+import org.individualproject.persistence.entity.ExcursionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -18,16 +20,15 @@ public class ExcursionService {
     public ExcursionService(ExcursionRepository exRepository){
         this.excursionRepository = exRepository;
     }
-    public List<Excursion> getExcursions() {
-        List<Excursion> excursions = excursionRepository.getExcursions().stream().toList();
-        return excursions;
+    public List<ExcursionEntity> getExcursions() {
+        return excursionRepository.findAll();
     }
-    public Optional<Excursion> getExcursion(Integer id) {
-        return excursionRepository.getExcursion(id);
+    public Optional<ExcursionEntity> getExcursion(Long id) {
+        return excursionRepository.findById(id);
     }
 
-    public Long createExcursion(CreateExcursionRequest request){
-        Excursion newExcursion = Excursion.builder()
+    public ExcursionEntity createExcursion(CreateExcursionRequest request){
+        ExcursionEntity newExcursion = ExcursionEntity.builder()
                 .name(request.getName())
                 .destinations(request.getDestinations())
                 .startDate(request.getStartDate())
@@ -35,33 +36,37 @@ public class ExcursionService {
                 .travelAgency(request.getTravelAgency())
                 .price(request.getPrice())
                 .build();
-        return  excursionRepository.createExcursion(newExcursion);
+        return  excursionRepository.save(newExcursion);
     }
 
-    public boolean deleteExcursion(Integer id){
-        return excursionRepository.deleteExcursion(id);
+    public boolean deleteExcursion(Long id) {
+        try {
+            excursionRepository.deleteById(id);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     public boolean updateExcursion(UpdateExcursionRequest request) {
-        Optional<Excursion> optionalExcursion = excursionRepository.getExcursion(request.getId());
-        if(optionalExcursion.isPresent()){
-            Excursion existingExcursion = optionalExcursion.get();
+        Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(request.getId());
+        if (optionalExcursion.isPresent()) {
+            ExcursionEntity existingExcursion = optionalExcursion.get();
             existingExcursion.setName(request.getName());
             existingExcursion.setDestinations(request.getDestinations());
             existingExcursion.setStartDate(request.getStartDate());
             existingExcursion.setEndDate(request.getEndDate());
             existingExcursion.setTravelAgency(request.getTravelAgency());
             existingExcursion.setPrice(request.getPrice());
-            return excursionRepository.updateExcursion(existingExcursion);
-
-        }
-        else {
+            excursionRepository.save(existingExcursion);
+            return true;
+        } else {
             return false;
         }
     }
 
-    public Optional<Excursion> getExcursionByName(String name){
-        return excursionRepository.getExcursionByName(name);
+    public Optional<ExcursionEntity> getExcursionByName(String name){
+        return excursionRepository.findByName(name);
 
     }
 
