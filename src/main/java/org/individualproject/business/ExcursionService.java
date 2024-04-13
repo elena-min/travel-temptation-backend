@@ -10,8 +10,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExcursionService {
@@ -20,23 +22,27 @@ public class ExcursionService {
     public ExcursionService(ExcursionRepository exRepository){
         this.excursionRepository = exRepository;
     }
-    public List<ExcursionEntity> getExcursions() {
-        return excursionRepository.findAll();
+    public List<Excursion> getExcursions() {
+        List<ExcursionEntity> excursionEntities = excursionRepository.findAll();
+        return mapToDomainList(excursionEntities);
     }
-    public Optional<ExcursionEntity> getExcursion(Long id) {
-        return excursionRepository.findById(id);
+    public Optional<Excursion> getExcursion(Long id) {
+        Optional<ExcursionEntity> excursionEntity = excursionRepository.findById(id);
+        return excursionEntity.map(this::mapToDomain);
     }
 
-    public ExcursionEntity createExcursion(CreateExcursionRequest request){
+    public Excursion createExcursion(CreateExcursionRequest request){
         ExcursionEntity newExcursion = ExcursionEntity.builder()
                 .name(request.getName())
-                .destinations(request.getDestinations())
+                .destinations(String.join(",", request.getDestinations()))
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .travelAgency(request.getTravelAgency())
                 .price(request.getPrice())
                 .build();
-        return  excursionRepository.save(newExcursion);
+
+        ExcursionEntity excursionEntity = excursionRepository.save(newExcursion);
+        return mapToDomain(excursionEntity);
     }
 
     public boolean deleteExcursion(Long id) {
@@ -53,7 +59,9 @@ public class ExcursionService {
         if (optionalExcursion.isPresent()) {
             ExcursionEntity existingExcursion = optionalExcursion.get();
             existingExcursion.setName(request.getName());
-            existingExcursion.setDestinations(request.getDestinations());
+            List<String> destinations = request.getDestinations();
+            String destinationsString = String.join(",", destinations);
+            existingExcursion.setDestinations(destinationsString);
             existingExcursion.setStartDate(request.getStartDate());
             existingExcursion.setEndDate(request.getEndDate());
             existingExcursion.setTravelAgency(request.getTravelAgency());
@@ -65,9 +73,30 @@ public class ExcursionService {
         }
     }
 
-    public Optional<ExcursionEntity> getExcursionByName(String name){
-        return excursionRepository.findByName(name);
-
+    public Optional<Excursion> getExcursionByName(String name){
+        Optional<ExcursionEntity> excursionEntity = excursionRepository.findByName(name);
+        return excursionEntity.map(this::mapToDomain);
     }
 
+    public List<Excursion> findExcursionsByName(String name){
+        List<ExcursionEntity> excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
+        return mapToDomainList(excursionEntities);
+    }
+    private Excursion mapToDomain(ExcursionEntity excursionEntity) {
+        List<String> destinations = Arrays.asList(excursionEntity.getDestinations().split(","));
+        Excursion excursion = Excursion.builder()
+                .name(excursionEntity.getName())
+                .destinations(destinations)
+                .startDate(excursionEntity.getStartDate())
+                .endDate(excursionEntity.getEndDate())
+                .travelAgency(excursionEntity.getTravelAgency())
+                .price(excursionEntity.getPrice())
+                .build();
+        return excursion;
+    }
+    private List<Excursion> mapToDomainList(List<ExcursionEntity> excursionEntities) {
+        return excursionEntities.stream()
+                .map(this::mapToDomain)
+                .collect(Collectors.toList());
+    }
 }

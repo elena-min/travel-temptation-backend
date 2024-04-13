@@ -26,4 +26,6 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
 
     Optional<ExcursionEntity> findByName(String name);
 
+    List<ExcursionEntity> findByNameContainingIgnoreCase(String name);
+
 }

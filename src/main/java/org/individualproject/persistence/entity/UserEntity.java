@@ -2,13 +2,12 @@ package org.individualproject.persistence.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.individualproject.domain.Gender;
+import org.individualproject.domain.enums.Gender;
 
 import java.util.Date;
 
@@ -46,6 +45,14 @@ public class UserEntity {
     @Length(min = 6)
     @Column(name = "password")
     private String password;
+
+    @NotBlank
+    @Column(name = "hashedPassword")
+    private String hashedPassword;
+
+    @NotBlank
+    @Column(name = "salt")
+    private String salt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")

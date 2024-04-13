@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.individualproject.domain.enums.Gender;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,5 +19,7 @@ public class User {
     private Date birthDate;
     private String email;
     private String password;
+    private String hashedPassword;
+    private String salt;
     private Gender gender;
 }

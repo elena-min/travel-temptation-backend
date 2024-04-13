@@ -20,5 +20,6 @@ public class Excursion {
     private Date endDate;
     private String travelAgency;
     private double price;
+    private int numberOfAvaliableSpaces;
 
 }
