@@ -1,5 +1,6 @@
 package org.individualproject.business;
 
+import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
@@ -24,11 +25,11 @@ public class ExcursionService {
     }
     public List<Excursion> getExcursions() {
         List<ExcursionEntity> excursionEntities = excursionRepository.findAll();
-        return mapToDomainList(excursionEntities);
+        return ExcursionConverter.mapToDomainList(excursionEntities);
     }
     public Optional<Excursion> getExcursion(Long id) {
         Optional<ExcursionEntity> excursionEntity = excursionRepository.findById(id);
-        return excursionEntity.map(this::mapToDomain);
+        return excursionEntity.map(ExcursionConverter::mapToDomain);
     }
 
     public Excursion createExcursion(CreateExcursionRequest request){
@@ -42,7 +43,7 @@ public class ExcursionService {
                 .build();
 
         ExcursionEntity excursionEntity = excursionRepository.save(newExcursion);
-        return mapToDomain(excursionEntity);
+        return ExcursionConverter.mapToDomain(excursionEntity);
     }
 
     public boolean deleteExcursion(Long id) {
@@ -75,28 +76,11 @@ public class ExcursionService {
 
     public Optional<Excursion> getExcursionByName(String name){
         Optional<ExcursionEntity> excursionEntity = excursionRepository.findByName(name);
-        return excursionEntity.map(this::mapToDomain);
+        return excursionEntity.map(ExcursionConverter::mapToDomain);
     }
 
     public List<Excursion> findExcursionsByName(String name){
         List<ExcursionEntity> excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
-        return mapToDomainList(excursionEntities);
-    }
-    private Excursion mapToDomain(ExcursionEntity excursionEntity) {
-        List<String> destinations = Arrays.asList(excursionEntity.getDestinations().split(","));
-        Excursion excursion = Excursion.builder()
-                .name(excursionEntity.getName())
-                .destinations(destinations)
-                .startDate(excursionEntity.getStartDate())
-                .endDate(excursionEntity.getEndDate())
-                .travelAgency(excursionEntity.getTravelAgency())
-                .price(excursionEntity.getPrice())
-                .build();
-        return excursion;
-    }
-    private List<Excursion> mapToDomainList(List<ExcursionEntity> excursionEntities) {
-        return excursionEntities.stream()
-                .map(this::mapToDomain)
-                .collect(Collectors.toList());
+        return ExcursionConverter.mapToDomainList(excursionEntities);
     }
 }

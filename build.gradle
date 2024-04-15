@@ -2,11 +2,29 @@ plugins {
     id 'org.springframework.boot' version '3.1.0'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
+    id "org.sonarqube" version "4.4.1.3373"
+    id 'jacoco'
 }
 
 group = 'org.example'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '17'
+
+
+sonar {
+    properties {
+        property "sonar.projectKey", "Individual-Project"
+        property "sonar.projectName", "Individual Project"
+        property "sonar.qualitygate.wait", true
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
+}
+
 
 configurations {
     compileOnly {
@@ -33,6 +51,14 @@ dependencies {
     //testImplementation 'com.playtika.testcontainers:embedded-mysql:3.0.0-RC9'
 }
 
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
 test {
     useJUnitPlatform()
+}
+
+tasks.named('sonar').configure {
+    dependsOn test
 }
