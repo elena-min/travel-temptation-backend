@@ -47,4 +47,9 @@ public class ExcursionEntity {
     @Min(0)
     @Column(name = "price")
     private double price;
+
+    @NotNull
+    @Column(name = "numberOfAvaliableSpaces")
+    private int numberOfAvaliableSpaces;
+
 }
