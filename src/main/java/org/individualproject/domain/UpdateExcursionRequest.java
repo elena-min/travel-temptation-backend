@@ -35,4 +35,8 @@ public class UpdateExcursionRequest {
 
     @Min(0)
     private double price;
+
+    @Min(0)
+    private int numberOfAvaliableSpaces;
+
 }

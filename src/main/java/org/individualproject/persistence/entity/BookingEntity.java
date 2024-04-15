@@ -13,35 +13,35 @@ import org.individualproject.domain.enums.BookingStatus;
 
 import java.time.LocalDateTime;
 
-//@Entity
-//@Data
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@Builder
-//@Table(name = "booking")
-//public class BookingEntity {
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "booking")
+public class BookingEntity {
 
-//    @Id
-//    private Long id;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private UserEntity user;
-//
-//    @ManyToOne
-//    @Column(name = "excursion_id")
-//    private ExcursionEntity excursion;
-//
-//    @Column(name = "bookingTime")
-//    private LocalDateTime bookingTime;
-//
-//    @Column(name = "status")
-//    private BookingStatus status;
-//
-//    @ManyToOne
-//    @Column(name = "bankingDetails_id")
-//    private PaymentDetailsEntity bankingDetails;
-//
-//    @Column(name = "numberOfTravelers")
-//    private int numberOfTravelers;
-//}
+    @Id
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
+    @ManyToOne
+    @JoinColumn(name = "excursion_id")
+    private ExcursionEntity excursion;
+
+    @Column(name = "bookingTime")
+    private LocalDateTime bookingTime;
+
+    @Column(name = "status")
+    private BookingStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "bankingDetails_id")
+    private PaymentDetailsEntity bankingDetails;
+
+    @Column(name = "numberOfTravelers")
+    private int numberOfTravelers;
+}

@@ -1,6 +1,5 @@
 package org.individualproject.persistence;
 
-import org.individualproject.domain.Excursion;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

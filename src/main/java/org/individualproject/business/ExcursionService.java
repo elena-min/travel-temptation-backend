@@ -40,6 +40,7 @@ public class ExcursionService {
                 .endDate(request.getEndDate())
                 .travelAgency(request.getTravelAgency())
                 .price(request.getPrice())
+                .numberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces())
                 .build();
 
         ExcursionEntity excursionEntity = excursionRepository.save(newExcursion);
@@ -67,6 +68,7 @@ public class ExcursionService {
             existingExcursion.setEndDate(request.getEndDate());
             existingExcursion.setTravelAgency(request.getTravelAgency());
             existingExcursion.setPrice(request.getPrice());
+            existingExcursion.setNumberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces());
             excursionRepository.save(existingExcursion);
             return true;
         } else {

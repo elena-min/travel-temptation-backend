@@ -12,9 +12,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class PaymentDetails {
+    private Long id;
+    private User user;
     private String cardNumber;
     private String cvv;
     private LocalDate expirationDate;
     private String cardHolderName;
-
 }

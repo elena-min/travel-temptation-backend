@@ -23,18 +23,17 @@ public class ExcursionsController {
     }
 
     @GetMapping("/{id}")
-    public Excursion getExcursion(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<Excursion> getExcursion(@PathVariable(value = "id") final Long id)
     {
         final Optional<Excursion> excursionOptional = excursionService.getExcursion(id);
-        if (excursionOptional.isPresent()) {
-            return excursionOptional.get();
-        }
-        return null;
+        return excursionOptional.map(excursion -> ResponseEntity.ok().body(excursion))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping()
-    public List<Excursion> getExcursions()
+    public ResponseEntity<List<Excursion>> getExcursions()
     {
-        return excursionService.getExcursions();
+        List<Excursion> excursions = excursionService.getExcursions();
+        return ResponseEntity.ok().body(excursions);
     }
 
     @PostMapping()
@@ -61,13 +60,12 @@ public class ExcursionsController {
     }
 
     @GetMapping("/name/{name}")
-    public Excursion getExcursionByName(@PathVariable(value = "name") final String name)
+    public ResponseEntity<Excursion> getExcursionByName(@PathVariable(value = "name") final String name)
     {
         final Optional<Excursion> excursionOptional = excursionService.getExcursionByName(name);
-        if (excursionOptional.isPresent()) {
-            return excursionOptional.get();
-        }
-        return null;
+        return excursionOptional.map(excursion -> ResponseEntity.ok().body(excursion))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
     @GetMapping("/search")

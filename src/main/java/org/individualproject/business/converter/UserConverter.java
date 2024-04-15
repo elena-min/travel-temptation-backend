@@ -13,6 +13,7 @@ public class UserConverter {
 
     public static User mapToDomain(UserEntity userEntity) {
         User user = User.builder()
+                .id(userEntity.getId())
                 .firstName(userEntity.getFirstName())
                 .lastName(userEntity.getLastName())
                 .birthDate(userEntity.getBirthDate())
@@ -28,5 +29,20 @@ public class UserConverter {
         return userEntities.stream()
                 .map(UserConverter::mapToDomain)
                 .collect(Collectors.toList());
+    }
+
+    public static UserEntity convertToEntity(User user){
+        UserEntity userEntity = UserEntity.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .birthDate(user.getBirthDate())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .hashedPassword(user.getHashedPassword())
+                .salt(user.getSalt())
+                .gender(user.getGender())
+                .build();
+        return userEntity;
     }
 }

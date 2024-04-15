@@ -21,6 +21,9 @@ public class UpdateBookingRequest {
     private Long id;
 
     @NotNull
+    private User user;
+
+    @NotNull
     private  Excursion excursion;
 
     @NotNull
