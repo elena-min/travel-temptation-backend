@@ -17,19 +17,15 @@ public class BookingConverter {
     public static Booking mapToDomain(BookingEntity bookingEntity) {
         User user = UserConverter.mapToDomain(bookingEntity.getUser());
         Excursion excursion = ExcursionConverter.mapToDomain(bookingEntity.getExcursion());
-        PaymentDetails paymentDetailsEntity = PaymentDetails.builder()
-                .cvv("123")
-                .cardHolderName("NIck JOnas")
-                .cardNumber("2345")
-                .expirationDate(LocalDate.EPOCH)
-                .build();
+        PaymentDetails paymentDetails = PaymentDetailsConverter.mapToDomain(bookingEntity.getBankingDetails());
 
         Booking booking = Booking.builder()
+                .id(bookingEntity.getId())
                 .user(user)
                 .excursion(excursion)
                 .bookingTime(bookingEntity.getBookingTime())
                 .status(bookingEntity.getStatus())
-                .bankingDetails(paymentDetailsEntity)
+                .bankingDetails(paymentDetails)
                 .numberOfTravelers(bookingEntity.getNumberOfTravelers())
                 .build();
         return booking;

@@ -60,19 +60,25 @@ public class UserService {
         Optional<UserEntity> optionalUser = userRepository.findById(request.getId());
         if (optionalUser.isPresent()) {
             UserEntity existingUser = optionalUser.get();
-            existingUser.setFirstName(request.getFirstName());
-            existingUser.setLastName(request.getLastName());
-            existingUser.setBirthDate(request.getBirthDate());
-            existingUser.setGender(request.getGender());
-            existingUser.setEmail(request.getEmail());
-            existingUser.setPassword(request.getPassword());
-            existingUser.setHashedPassword(request.getHashedPassword());
-            existingUser.setSalt(request.getSalt());
-            userRepository.save(existingUser);
+
+            if(existingUser.getFirstName()!= null){
+                existingUser.setFirstName(request.getFirstName());
+            }
+            if(existingUser.getLastName()!= null){
+                existingUser.setLastName(request.getLastName());
+            }
+            if(existingUser.getGender()!= null){
+                existingUser.setGender(request.getGender());
+            }
+            if(existingUser.getBirthDate()!= null){
+                existingUser.setBirthDate(request.getBirthDate());
+            }
+            userRepository.save(existingUser); // This should not trigger password validation
             return true;
         } else {
             return false;
         }
     }
+
 
 }

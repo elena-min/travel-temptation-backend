@@ -22,25 +22,10 @@ public class UpdateUserRequest {
     @NotBlank
     private String lastName;
 
-
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Past
     private Date birthDate;
-
-    @NotBlank
-    @Email
-    private String email;
-
-    @NotBlank
-    @Size(min= 6)
-    private String password;
-
-    @NotBlank
-    private String hashedPassword;
-
-    @NotBlank
-    private String salt;
 
     @NotNull
     private Gender gender;
