@@ -1,23 +1,30 @@
 package org.individualproject.business;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import org.individualproject.business.converter.ExcursionConverter;
+import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.domain.CreateExcursionRequest;
+import org.individualproject.domain.CreateUserRequest;
 import org.individualproject.domain.Excursion;
+import org.individualproject.domain.UpdateExcursionRequest;
 import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.implementation.FakePostRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.EmptyResultDataAccessException;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import javax.swing.text.html.Option;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Stream;
 
 //This annotation says to use the MockitoExtension class, who is responsible for initializing the Mockito framework for the tests
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +38,7 @@ class ExcursionServiceTest {
     @InjectMocks
     private ExcursionService excursionService;
     @Test
-    void getExcursions() {
+    void getExcursions_shouldReturnExcursions() {
         // Arrange
         List<ExcursionEntity> fakeExcursions = Arrays.asList(
                 new ExcursionEntity(
@@ -79,7 +86,20 @@ class ExcursionServiceTest {
     }
 
     @Test
-    void getExcursion() {
+    void getExcursions_shouldReturnEmptyListWithNoExcursions(){
+        // Arrange
+        when(excursionRepository.findAll()).thenReturn(Collections.emptyList());
+        //Act
+        List<Excursion> result = excursionService.getExcursions();
+
+        //Assert
+        assertTrue(result.isEmpty());
+        verify(excursionRepository, times(1)).findAll();
+
+    }
+
+    @Test
+    void getExcursion_shouldReturnExcursion() {
         ExcursionEntity fakeExcursion = ExcursionEntity.builder()
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
@@ -103,9 +123,23 @@ class ExcursionServiceTest {
         assertEquals(Optional.of(excursion), result);
     }
 
+    @Test
+    void getExcursion_shouldReturnEmptyOptionalWithNoExcursionFound(){
+        // Arrange
+        Long id = 1L;
+        when(excursionRepository.findById(id)).thenReturn(Optional.empty());
+        //Act
+        Optional<Excursion> result = excursionService.getExcursion(id);
+
+        //Assert
+        assertTrue(result.isEmpty());
+        verify(excursionRepository, times(1)).findById(id);
+
+    }
+
 
     @Test
-    void createExcursion() {
+    void createExcursion_shouldCreateExcursion() {
         ExcursionEntity savedExcursionEntity = ExcursionEntity.builder()
                 .id(1L)
                 .name("Test Excursion")
@@ -132,6 +166,262 @@ class ExcursionServiceTest {
 
         // Assert
         verify(excursionRepository, times(1)).save(any(ExcursionEntity.class));
+
+    }
+    @ParameterizedTest
+    @MethodSource("provideStringsForIsParams")
+    void createExcursion_shouldThrowExceptionForInvalidInput(String name, List<String> destinations, Date startdate, Date endDate, String travelAgnecy, Double price, int spaces) {
+        // Act
+        CreateExcursionRequest createRequest = CreateExcursionRequest.builder()
+                .name(name)
+                .destinations(destinations)
+                .startDate(startdate)
+                .endDate(endDate)
+                .travelAgency(travelAgnecy)
+                .price(price)
+                .numberOfAvaliableSpaces(spaces)
+                .build();
+        // Arrange & Assert
+        assertThrows(InvalidExcursionDataException.class, () -> excursionService.createExcursion(createRequest));
+        verify(excursionRepository, never()).save(any());
+    }
+
+    private static Stream<Arguments> provideStringsForIsParams() {
+        // TODO: Include all variations
+        return Stream.of(
+                Arguments.of(null, Arrays.asList("Destination1", "Destination2"), new Date(), new Date(), "Test Agency", 1000.0, 23), // Null name
+                Arguments.of("Test Excursion", null, new Date(), new Date(), "Test Agency", 1000.0, 23), // Null destinations
+                Arguments.of("Test Excursion", Arrays.asList("Destination1", "Destination2"), null, new Date(), "Test Agency", 1000.0, 23), // Null start date
+                Arguments.of("Test Excursion", Arrays.asList("Destination1", "Destination2"), new Date(), null, "Test Agency", 1000.0, 23), // Null end date
+                Arguments.of("Test Excursion", Arrays.asList("Destination1", "Destination2"), new Date(), new Date(), null, 1000.0, 23), // Null travel agency
+                Arguments.of("Test Excursion", Arrays.asList("Destination1", "Destination2"), new Date(), new Date(), "Test Agency", -1000.0, 23), // Negative price
+                Arguments.of("Test Excursion", Arrays.asList("Destination1", "Destination2"), new Date(), new Date(), "Test Agency", 1000.0, -23) // Negative spaces
+        );
+    }
+    @Test
+    void updateExcursion_shouldUpdateExistingExcursion(){
+        Date startDate = new Date(1234567890L); // Sample date
+        Date endDate = new Date(1234567890123L);
+        ExcursionEntity savedExcursionEntity = ExcursionEntity.builder()
+                .id(1L)
+                .name("Test Excursion")
+                .destinations("Destination1,Destination2")
+                .startDate(new Date(1234567890L))
+                .endDate(new Date(1234567890123L))
+                .travelAgency("Test Agency")
+                .price(1000.0)
+                .build();
+
+        when(excursionRepository.findById(1L)).thenReturn(Optional.of(savedExcursionEntity));
+
+        UpdateExcursionRequest updateExcursionRequest = new UpdateExcursionRequest(
+                1L,
+                "Test Excursion",
+                Arrays.asList("Destination1", "Destination2"),
+                startDate,
+                endDate,
+                "Test Agency",
+                1000.0,
+                23
+                );
+        // Act:
+        boolean updateResult = excursionService.updateExcursion(updateExcursionRequest);
+
+        // Assert
+        assertTrue(updateResult);
+        verify(excursionRepository, times(1)).save(any(ExcursionEntity.class));
+
+    }
+
+    @Test
+    void updateExcursion_shouldDeleteExistingExcursion(){
+        when(excursionRepository.findById(1L)).thenReturn(Optional.empty());
+
+        UpdateExcursionRequest updateExcursionRequest = new UpdateExcursionRequest(
+                1L,
+                "Test Excursion",
+                Arrays.asList("Destination1", "Destination2"),
+                new Date(1234567890L),
+                new Date(1234567890123L),
+                "Test Agency",
+                1000.0,
+                23
+        );
+        // Act:
+        boolean updateResult = excursionService.updateExcursion(updateExcursionRequest);
+
+        // Assert
+        assertFalse(updateResult);
+        verify(excursionRepository, never()).save(any(ExcursionEntity.class));
+
+    }
+
+    @Test
+    void deleteExcursion_shouldDeleteExistingExcursion(){
+        Long excursionID = 1L;
+
+        doNothing().when(excursionRepository).deleteById(excursionID);
+
+        boolean result = excursionService.deleteExcursion(excursionID);
+
+        assertTrue(result);
+        verify(excursionRepository, times(1)).deleteById(excursionID);
+    }
+
+    @Test
+    void deleteExcursion_shouldReturnFalseForDeleteNonExistingExcursion(){
+        Long excursionID = 1L;
+
+        doThrow(EmptyResultDataAccessException.class).when(excursionRepository).deleteById(excursionID);
+
+        boolean result = excursionService.deleteExcursion(excursionID);
+
+        assertFalse(result);
+        verify(excursionRepository, times(1)).deleteById(excursionID);
+    }
+
+    @Test
+    void getExcursionByName_shouldReturnExistingExcursion(){
+        String excursion_name = "Test Excursion";
+        Date startDate = new Date(System.currentTimeMillis() + 1000000);
+        Date endDate = new Date(System.currentTimeMillis() + 2000000);
+        ExcursionEntity excursionEntity = ExcursionEntity.builder()
+                .id(1L)
+                .name(excursion_name)
+                .destinations("Destination1,Destination2")
+                .startDate(startDate)
+                .endDate(endDate)
+                .travelAgency("Test Agency")
+                .price(1000.0)
+                .numberOfAvaliableSpaces(10)
+                .build();
+
+        when(excursionRepository.findByName(excursion_name)).thenReturn(Optional.of(excursionEntity));
+
+        Excursion expected = Excursion.builder()
+                .id(1L)
+                .name(excursion_name)
+                .destinations(Arrays.asList("Destination1", "Destination2"))
+                .startDate(startDate)
+                .endDate(endDate)
+                .travelAgency("Test Agency")
+                .price(1000.0)
+                .numberOfAvaliableSpaces(10)
+                .build();
+
+        //Act
+        Optional<Excursion> result = excursionService.getExcursionByName(excursion_name);
+
+        //Assert
+        assertEquals(Optional.of(expected), result);
+        verify(excursionRepository, times(1)).findByName(excursion_name);
+
+    }
+
+    @Test
+    void getExcursionByName_excursionDoesNotExist_shouldReturnEmptyOptional(){
+        String excursion_name = "Test Excursion";
+
+        when(excursionRepository.findByName(excursion_name)).thenReturn(Optional.empty());
+
+        //Act
+        Optional<Excursion> result = excursionService.getExcursionByName(excursion_name);
+
+        //Assert
+        assertEquals(Optional.empty(), result);
+        verify(excursionRepository, times(1)).findByName(excursion_name);
+
+    }
+
+    @Test
+    void findExcursionsByName_shouldReturnMatchingExcursions(){
+        // Arrange
+        Date startDate = new Date(System.currentTimeMillis() + 1000000);
+        Date endDate = new Date(System.currentTimeMillis() + 2000000);
+        String name = "Test";
+        List<ExcursionEntity> fakeExcursions = Arrays.asList(
+                new ExcursionEntity(
+                        1L,
+                        "Mountain Test",
+                        "Mount Everest Base Camp,Annapurna Circuit",
+                        startDate,
+                        endDate,
+                        "Adventure Tours",
+                        1500.0,
+                        23
+                ),
+
+                new ExcursionEntity(
+                        2L,
+                        "City",
+                        "Paris,Rome,Barcelona",
+                        startDate,
+                        endDate,
+                        "City Explorers",
+                        1200.0,
+                        29
+
+                ),
+
+                new ExcursionEntity(
+                        3L,
+                        "Beach Testing",
+                        "Maldives,Phuket,Bora Bora",
+                        startDate,
+                        endDate,
+                        "Sunshine Travel",
+                        2000.0,
+                        209
+                ));
+
+        when(excursionRepository.findByNameContainingIgnoreCase(name))
+                .thenReturn(Arrays.asList(fakeExcursions.get(0), fakeExcursions.get(2)));
+
+        List<Excursion> expectedExcursions = Arrays.asList(
+                new Excursion(
+                        1L,
+                        "Mountain Test",
+                        Arrays.asList("Mount Everest Base Camp","Annapurna Circuit"),
+                        startDate,
+                        endDate,
+                        "Adventure Tours",
+                        1500.0,
+                        23
+                ),
+                new Excursion(
+                        3L,
+                        "Beach Testing",
+                        Arrays.asList("Maldives", "Phuket","Bora Bora"),
+                        startDate,
+                        endDate,
+                        "Sunshine Travel",
+                        2000.0,
+                        209
+                )
+        );
+
+
+
+        //Act
+        List<Excursion> result = excursionService.findExcursionsByName(name);
+
+        //Assert
+        assertEquals(expectedExcursions, result);
+        verify(excursionRepository, times(1)).findByNameContainingIgnoreCase(name);
+
+    }
+    @Test
+    void findExcursionsByName_shouldReturnEmptyList_NoMatchingExcursions(){
+        // Arrange
+
+        String name = "Test";
+        when(excursionRepository.findByNameContainingIgnoreCase(name)).thenReturn(Collections.emptyList());
+        //Act
+        List<Excursion> result = excursionService.findExcursionsByName(name);
+
+        //Assert
+        assertTrue(result.isEmpty());
+        verify(excursionRepository, times(1)).findByNameContainingIgnoreCase(name);
 
     }
 }

@@ -1,6 +1,7 @@
 package org.individualproject.business;
 
 import org.individualproject.business.converter.ExcursionConverter;
+import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
@@ -33,6 +34,11 @@ public class ExcursionService {
     }
 
     public Excursion createExcursion(CreateExcursionRequest request){
+        if (request.getName() == null || request.getDestinations() == null || request.getStartDate() == null ||
+                request.getEndDate() == null || request.getTravelAgency() == null || request.getPrice() < 0 ||
+                request.getNumberOfAvaliableSpaces() < 0) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
         ExcursionEntity newExcursion = ExcursionEntity.builder()
                 .name(request.getName())
                 .destinations(String.join(",", request.getDestinations()))

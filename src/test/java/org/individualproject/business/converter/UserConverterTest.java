@@ -7,6 +7,7 @@ import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -18,11 +19,13 @@ class UserConverterTest {
 
     @Test
     void mapToDomain() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
                 .firstName("Nick")
                 .lastName("Jonas")
-                .birthDate(new Date(114, 4, 26))
+                .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .password("NickBest")
                 .hashedPassword("asdfgh")
@@ -47,12 +50,14 @@ class UserConverterTest {
 
     @Test
     void mapToDomainList() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
         List<UserEntity> userEntities = new ArrayList<>();
         UserEntity userEntity1 = UserEntity.builder()
                 .id(1L)
                 .firstName("Nick")
                 .lastName("Jonas")
-                .birthDate(new Date(114, 4, 26))
+                .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .password("NickBest")
                 .hashedPassword("asdfgh")
@@ -63,7 +68,7 @@ class UserConverterTest {
                 .id(2L)
                 .firstName("Joe")
                 .lastName("Jonas")
-                .birthDate(new Date(114, 6, 1))
+                .birthDate(date)
                 .email("JOeJonas@gmail.com")
                 .password("JOe123")
                 .hashedPassword("zxcvbnm")
@@ -101,11 +106,13 @@ class UserConverterTest {
 
     @Test
     void convertToEntity() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
         User user = User.builder()
                 .id(1L)
                 .firstName("Nick")
                 .lastName("Jonas")
-                .birthDate(new Date(114, 4, 26))
+                .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .password("NickBest")
                 .hashedPassword("asdfgh")

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.individualproject.domain.enums.Gender;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -24,7 +25,7 @@ public class CreateUserRequest {
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Past
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @NotBlank
     @Email

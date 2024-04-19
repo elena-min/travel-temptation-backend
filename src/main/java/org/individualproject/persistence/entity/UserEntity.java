@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.individualproject.domain.enums.Gender;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -35,7 +36,7 @@ public class UserEntity {
 
     @Temporal(TemporalType.DATE)
     @Column(name = "birthDate")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @NotBlank
     @Column(name = "email")

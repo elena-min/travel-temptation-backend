@@ -15,10 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
@@ -28,16 +25,16 @@ class BookingConverterTest {
 
     @Test
     void mapToDomain() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
         BookingEntity bookingEntity = mock(BookingEntity.class);
         when(bookingEntity.getBookingTime()).thenReturn(LocalDateTime.now());
         when(bookingEntity.getStatus()).thenReturn(BookingStatus.PENDING);
         when(bookingEntity.getNumberOfTravelers()).thenReturn(4);
-
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
                 .firstName("Nick")
                 .lastName("Jonas")
-                .birthDate(new Date(114, 4, 26))
+                .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .password("NickBest")
                 .hashedPassword("asdfgh")
@@ -87,6 +84,8 @@ class BookingConverterTest {
 
     @Test
     void mapToDomainList() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
         List<BookingEntity> bookingEntityList = new ArrayList<>();
         BookingEntity bookingEntity = mock(BookingEntity.class);
         when(bookingEntity.getBookingTime()).thenReturn(LocalDateTime.now());
@@ -97,7 +96,7 @@ class BookingConverterTest {
                 .id(1L)
                 .firstName("Nick")
                 .lastName("Jonas")
-                .birthDate(new Date(114, 4, 26))
+                .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .password("NickBest")
                 .hashedPassword("asdfgh")
