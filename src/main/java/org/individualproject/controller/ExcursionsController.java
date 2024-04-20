@@ -68,9 +68,28 @@ public class ExcursionsController {
 
     }
 
+//    @GetMapping("/search")
+//    public ResponseEntity<List<Excursion>> searchExcursionByName(final String name){
+//        List<Excursion> excursions = excursionService.findExcursionsByName(name);
+//        return ResponseEntity.ok().body(excursions);
+//    }
+
     @GetMapping("/search")
-    public ResponseEntity<List<Excursion>> searchExcursionByName(final String name){
-        List<Excursion> excursions = excursionService.findExcursionsByName(name);
+    public ResponseEntity<List<Excursion>> searchExcursionByNameAndPrice(@RequestParam(value= "name", required = false) String name, @RequestParam(value= "priceRange", required = false) String priceRange ){
+        List<Excursion> excursions;
+        if(name != null && priceRange != null){
+            excursions = excursionService.searchExcursionsByNameAndPriceRange(name, priceRange);
+        }
+        else if(name != null){
+            excursions = excursionService.findExcursionsByName(name);
+
+        }
+        else if(priceRange != null){
+            excursions = excursionService.findExcursionsByPriceRange(priceRange);
+        }
+        else{
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok().body(excursions);
     }
 }

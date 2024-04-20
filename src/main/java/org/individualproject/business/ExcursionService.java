@@ -12,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -91,4 +92,44 @@ public class ExcursionService {
         List<ExcursionEntity> excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
         return ExcursionConverter.mapToDomainList(excursionEntities);
     }
+
+    public List<Excursion> findExcursionsByPriceRange(String priceRange){
+        List<ExcursionEntity> excursionEntities;
+        if (priceRange.startsWith("<") || priceRange.startsWith(">")) {
+            double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" or "<" symbol
+            if (priceRange.startsWith(">")) {
+                excursionEntities = excursionRepository.findByPriceGreaterThan(price);
+            } else {
+                excursionEntities = excursionRepository.findByPriceLessThan(price);
+            }
+        } else {
+            String[] prices = priceRange.split("-");
+            double minPrice = Double.parseDouble(prices[0]);
+            double maxPrice = Double.parseDouble(prices[1]);
+            excursionEntities = excursionRepository.findByPriceRange(minPrice, maxPrice);
+        }
+        return ExcursionConverter.mapToDomainList(excursionEntities);
+    }
+
+    public List<Excursion> searchExcursionsByNameAndPriceRange(String name, String priceRange) {
+        List<ExcursionEntity> excursionEntities = new ArrayList<>();
+        if (priceRange != null && !priceRange.isEmpty()) {
+            if (priceRange.startsWith(">") || priceRange.endsWith(">")) {
+                double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" symbol
+                excursionEntities = excursionRepository.findByPriceGreaterThan(price);
+            } else if (priceRange.startsWith("<") || priceRange.endsWith("<")) {
+                double price = Double.parseDouble(priceRange.substring(1)); // Remove the "<" symbol
+                excursionEntities = excursionRepository.findByPriceLessThan(price);
+            } else {
+                String[] prices = priceRange.split("-");
+                double minPrice = Double.parseDouble(prices[0]);
+                double maxPrice = Double.parseDouble(prices[1]);
+                excursionEntities = excursionRepository.findByPriceRange(minPrice, maxPrice);
+            }
+        } else {
+            excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
+        }
+        return ExcursionConverter.mapToDomainList(excursionEntities);
+    }
+
 }

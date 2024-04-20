@@ -27,4 +27,11 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
 
     List<ExcursionEntity> findByNameContainingIgnoreCase(String name);
 
+    @Query("select e from ExcursionEntity e where e.price >= ?1 and e.price <= ?2 ")
+    List<ExcursionEntity> findByPriceRange(double minPrice, double maxPrice);
+
+    List<ExcursionEntity> findByPriceGreaterThan(double price);
+
+    List<ExcursionEntity> findByPriceLessThan(double price);
+
 }
