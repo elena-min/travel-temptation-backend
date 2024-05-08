@@ -23,11 +23,9 @@ import java.util.stream.Collectors;
 @Service
 public class BookingService {
     private BookingRepository bookingRepository;
-    private UserRepository userRepository;
     @Autowired
-    public BookingService(BookingRepository bRepository, UserRepository uRepository){
+    public BookingService(BookingRepository bRepository){
         this.bookingRepository = bRepository;
-        this.userRepository = uRepository;
     }
     public List<Booking> getBookings() {
         List<BookingEntity> bookingEntities = bookingRepository.findAll();
@@ -67,7 +65,6 @@ public class BookingService {
     }
 
     public boolean updateBooking(UpdateBookingRequest updateBookingRequest) {
-        UserEntity userEntity = UserConverter.convertToEntity(updateBookingRequest.getUser());
         ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(updateBookingRequest.getExcursion());
         PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsEntity.builder()
                 .id(1L)

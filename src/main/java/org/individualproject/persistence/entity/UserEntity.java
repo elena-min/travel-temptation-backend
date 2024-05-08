@@ -10,7 +10,6 @@ import org.hibernate.validator.constraints.Length;
 import org.individualproject.domain.enums.Gender;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Data

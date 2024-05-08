@@ -10,13 +10,10 @@ import org.individualproject.persistence.entity.ExcursionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ExcursionService {
@@ -113,23 +110,43 @@ public class ExcursionService {
 
     public List<Excursion> searchExcursionsByNameAndPriceRange(String name, String priceRange) {
         List<ExcursionEntity> excursionEntities = new ArrayList<>();
-        if (priceRange != null && !priceRange.isEmpty()) {
-            if (priceRange.startsWith(">") || priceRange.endsWith(">")) {
-                double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" symbol
-                excursionEntities = excursionRepository.findByPriceGreaterThan(price);
-            } else if (priceRange.startsWith("<") || priceRange.endsWith("<")) {
-                double price = Double.parseDouble(priceRange.substring(1)); // Remove the "<" symbol
-                excursionEntities = excursionRepository.findByPriceLessThan(price);
+        if (name != null && !name.isEmpty()) {
+            // Search by both name and price range
+            if (priceRange != null && !priceRange.isEmpty()) {
+                if (priceRange.startsWith(">") || priceRange.endsWith(">")) {
+                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" symbol
+                    excursionEntities = excursionRepository.findByNameContainingIgnoreCaseAndPriceGreaterThan(name, price);
+                } else if (priceRange.startsWith("<") || priceRange.endsWith("<")) {
+                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the "<" symbol
+                    excursionEntities = excursionRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price);
+                } else {
+                    String[] prices = priceRange.split("-");
+                    double minPrice = Double.parseDouble(prices[0]);
+                    double maxPrice = Double.parseDouble(prices[1]);
+                    excursionEntities = excursionRepository.findByNameContainingIgnoreCaseAndPriceRange(name, minPrice, maxPrice);
+                }
             } else {
-                String[] prices = priceRange.split("-");
-                double minPrice = Double.parseDouble(prices[0]);
-                double maxPrice = Double.parseDouble(prices[1]);
-                excursionEntities = excursionRepository.findByPriceRange(minPrice, maxPrice);
+                excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
             }
         } else {
-            excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
+            // Search only by price range
+            if (priceRange != null && !priceRange.isEmpty()) {
+                if (priceRange.startsWith(">") || priceRange.endsWith(">")) {
+                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" symbol
+                    excursionEntities = excursionRepository.findByPriceGreaterThan(price);
+                } else if (priceRange.startsWith("<") || priceRange.endsWith("<")) {
+                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the "<" symbol
+                    excursionEntities = excursionRepository.findByPriceLessThan(price);
+                } else {
+                    String[] prices = priceRange.split("-");
+                    double minPrice = Double.parseDouble(prices[0]);
+                    double maxPrice = Double.parseDouble(prices[1]);
+                    excursionEntities = excursionRepository.findByPriceRange(minPrice, maxPrice);
+                }
+            }
         }
         return ExcursionConverter.mapToDomainList(excursionEntities);
     }
+
 
 }

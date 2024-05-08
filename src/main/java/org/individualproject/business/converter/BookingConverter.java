@@ -5,12 +5,7 @@ import org.individualproject.domain.Excursion;
 import org.individualproject.domain.PaymentDetails;
 import org.individualproject.domain.User;
 import org.individualproject.persistence.entity.BookingEntity;
-import org.individualproject.persistence.entity.PaymentDetailsEntity;
-
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BookingConverter {
 
@@ -33,6 +28,8 @@ public class BookingConverter {
     public static List<Booking> mapToDomainList(List<BookingEntity> bookingEntities) {
         return bookingEntities.stream()
                 .map(BookingConverter::mapToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
+
+    private BookingConverter(){}
 }

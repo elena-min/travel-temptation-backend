@@ -3,6 +3,7 @@ package org.individualproject.persistence;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,5 +34,12 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
     List<ExcursionEntity> findByPriceGreaterThan(double price);
 
     List<ExcursionEntity> findByPriceLessThan(double price);
+
+    @Query("select e from ExcursionEntity e where lower(e.name) like %:name% and e.price >= :minPrice and e.price <= :maxPrice")
+    List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceRange(@Param("name") String name, @Param("minPrice") double minPrice, @Param("maxPrice") double maxPrice);
+
+    List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceGreaterThan(String name,double price);
+
+    List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceLessThan(String name, double price);
 
 }

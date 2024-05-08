@@ -26,6 +26,8 @@ public class PaymentDetailsConverter {
     public static List<PaymentDetails> mapToDomainList(List<PaymentDetailsEntity> paymentDetailsEntities) {
         return paymentDetailsEntities.stream()
                 .map(PaymentDetailsConverter::mapToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
+
+    private PaymentDetailsConverter(){}
 }

@@ -4,8 +4,6 @@ import lombok.*;
 import org.individualproject.domain.enums.Gender;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Objects;
 
 @Data
 @NoArgsConstructor

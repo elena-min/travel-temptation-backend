@@ -44,4 +44,6 @@ public class ExcursionConverter {
                 .build();
         return excursionEntity;
     }
+
+    private ExcursionConverter(){}
 }

@@ -45,4 +45,6 @@ public class UserConverter {
                 .build();
         return userEntity;
     }
+
+    private UserConverter(){}
 }

@@ -8,7 +8,6 @@ import org.individualproject.domain.enums.Gender;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
