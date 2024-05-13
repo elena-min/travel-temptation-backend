@@ -41,9 +41,6 @@ public class RegisterRequest {
     @Length(min = 6)
     private String password;
 
-    @NotBlank
-    private String hashedPassword;
-
     @Enumerated(EnumType.STRING)
     private Gender gender;
 }

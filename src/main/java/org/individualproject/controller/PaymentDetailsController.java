@@ -34,7 +34,7 @@ public class PaymentDetailsController {
     }
 
     @PostMapping()
-    public ResponseEntity<PaymentDetails> createv(@RequestBody @Valid CreatePaymentDetailsRequest request) {
+    public ResponseEntity<PaymentDetails> create(@RequestBody @Valid CreatePaymentDetailsRequest request) {
         PaymentDetails response = paymentDetailsService.createPaymentDetails(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
