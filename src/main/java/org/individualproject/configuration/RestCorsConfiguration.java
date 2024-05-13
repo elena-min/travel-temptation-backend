@@ -13,7 +13,7 @@ public class RestCorsConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*") // Allow requests from your frontend
+                        .allowedOrigins("http://localhost:5173") // Allow requests from your frontend
                         .allowedMethods("GET", "POST", "PUT", "DELETE") // Allow specific HTTP methods
                         .allowedHeaders("*"); // Allow all headers
             }

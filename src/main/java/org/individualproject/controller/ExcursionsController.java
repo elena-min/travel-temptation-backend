@@ -38,14 +38,14 @@ public class ExcursionsController {
         return ResponseEntity.ok().body(excursions);
     }
 
-    @RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
+    //@RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
     @PostMapping()
     public ResponseEntity<Excursion> createExcursion(@RequestBody @Valid CreateExcursionRequest request) {
         Excursion response = excursionService.createExcursion(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
+    //@RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
     @DeleteMapping("/{id}")
     public ResponseEntity<Long> deleteExcursion(@PathVariable(value = "id") final Long id)
     {
@@ -55,7 +55,7 @@ public class ExcursionsController {
         return ResponseEntity.notFound().build();
     }
 
-    @RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
+    //@RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateExcursionRequest request){
 
