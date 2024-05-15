@@ -51,10 +51,6 @@ public class UserEntity {
     @Column(name = "hashedPassword")
     private String hashedPassword;
 
-    @NotBlank
-    @Column(name = "salt")
-    private String salt;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender;

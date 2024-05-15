@@ -24,7 +24,6 @@ public class CreateBookingRequest {
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
     private LocalDateTime bookingTime;
 
     @NotNull

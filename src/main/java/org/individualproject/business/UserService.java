@@ -38,7 +38,6 @@ public class UserService {
                 .birthDate(request.getBirthDate())
                 .email(request.getEmail())
                 .hashedPassword(request.getHashedPassword())
-                .salt(request.getSalt())
                 .gender(request.getGender())
                 .build();
 

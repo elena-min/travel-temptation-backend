@@ -37,9 +37,6 @@ public class CreateUserRequest {
     @NotBlank
     private String hashedPassword;
 
-    @NotBlank
-    private String salt;
-
     @NotNull
     private Gender gender;
 }
