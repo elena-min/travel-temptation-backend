@@ -52,4 +52,8 @@ public class ExcursionEntity {
     @Column(name = "numberOfAvaliableSpaces")
     private int numberOfAvaliableSpaces;
 
+    @NotNull
+    @Column(name = "numberOfSpacesLeft")
+    private int numberOfSpacesLeft;
+
 }

@@ -19,5 +19,6 @@ public class Excursion {
     private String travelAgency;
     private double price;
     private int numberOfAvaliableSpaces;
+    private int numberOfSpacesLeft;
 
 }

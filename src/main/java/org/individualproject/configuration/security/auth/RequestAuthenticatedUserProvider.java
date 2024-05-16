@@ -3,14 +3,18 @@ package org.individualproject.configuration.security.auth;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.context.WebApplicationContext;
 
 @Configuration
 public class RequestAuthenticatedUserProvider {
 
     @Bean
+    @Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     //This method retrieve the authenticated user information from the current request
     public AccessToken getAuthenticatedUserInRequest(){
         //First it checks the security context, which holds the security info

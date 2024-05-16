@@ -38,7 +38,7 @@ public class ExcursionsController {
         return ResponseEntity.ok().body(excursions);
     }
 
-    @RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
+    //@RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
     @PostMapping()
     public ResponseEntity<Excursion> createExcursion(@RequestBody @Valid CreateExcursionRequest request) {
         Excursion response = excursionService.createExcursion(request);

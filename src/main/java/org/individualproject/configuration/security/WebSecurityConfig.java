@@ -31,7 +31,9 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(registry ->
-                        registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        registry
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/bookings/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/excursions/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/excursions").permitAll()
                                 .requestMatchers(HttpMethod.DELETE, "/excursions/**").hasAnyRole("TRAVELINGAGENCY", "ADMIN") // Require TRAVELINGAGENCY or ADMIN role for DELETE
@@ -41,11 +43,9 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/bookings/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/bookings").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/payment-details/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/payment-details").permitAll()
-
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(configure -> configure.authenticationEntryPoint(authenticationEntryPoint))
@@ -60,7 +60,8 @@ public class WebSecurityConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**").allowedOrigins("http://localhost:5173")
                         .allowedHeaders("*")
-                        .exposedHeaders("Access-Control-Allow-Origin");
+                        .exposedHeaders("Access-Control-Allow-Origin")
+                        .allowedMethods("*");
             }
         };
     }

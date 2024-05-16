@@ -30,6 +30,19 @@ public class PaymentDetailsConverter {
                 .map(PaymentDetailsConverter::mapToDomain)
                 .toList();
     }
+    public static PaymentDetailsEntity convertToEntity(PaymentDetails paymentDetails){
+        UserEntity userEntity = UserConverter.convertToEntity(paymentDetails.getUser());
+        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsEntity.builder()
+                .id(paymentDetails.getId())
+                .user(userEntity)
+                .cardHolderName(paymentDetails.getCardHolderName())
+                .cardNumber(paymentDetails.getCardNumber())
+                .cvv(paymentDetails.getCvv())
+                .expirationDate(paymentDetails.getExpirationDate())
+                .build();
+        return paymentDetailsEntity;
+    }
+
 
     private PaymentDetailsConverter(){}
 }

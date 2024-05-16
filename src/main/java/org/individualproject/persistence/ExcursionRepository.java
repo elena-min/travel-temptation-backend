@@ -21,6 +21,9 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
 //    Optional<Excursion> getExcursionByName(String excursionName);
 
 
+    @Query("UPDATE ExcursionEntity e SET e.numberOfSpacesLeft = e.numberOfSpacesLeft - :spacesBooked WHERE e.id = :id AND e.numberOfSpacesLeft >= :spacesBooked")
+    int decrementSpacesLeft(@Param("id") Long id, @Param("spacesBooked") int spacesBooked);
+
     @Query("select e from ExcursionEntity e where e.name = ?1")
     ExcursionEntity getExcursionByName(String name);
 

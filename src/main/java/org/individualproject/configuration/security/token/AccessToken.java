@@ -25,5 +25,4 @@ public class AccessToken {
         return  this.roles.contains(roleName);
     }
 
-
 }

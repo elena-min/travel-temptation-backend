@@ -45,6 +45,7 @@ public class ExcursionService {
                 .travelAgency(request.getTravelAgency())
                 .price(request.getPrice())
                 .numberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces())
+                .numberOfSpacesLeft(request.getNumberOfAvaliableSpaces())
                 .build();
 
         ExcursionEntity excursionEntity = excursionRepository.save(newExcursion);
@@ -148,5 +149,11 @@ public class ExcursionService {
         return ExcursionConverter.mapToDomainList(excursionEntities);
     }
 
+    public void bookSpaces(Long id, int spacesBooked){
+        int updatedRows = excursionRepository.decrementSpacesLeft(id, spacesBooked);
+        if(updatedRows == 0){
+            throw new IllegalStateException("NOt enough spaces left for this excursion!");
+        }
+    }
 
 }

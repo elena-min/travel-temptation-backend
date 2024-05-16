@@ -21,6 +21,7 @@ public class ExcursionConverter {
                 .travelAgency(excursionEntity.getTravelAgency())
                 .price(excursionEntity.getPrice())
                 .numberOfAvaliableSpaces(excursionEntity.getNumberOfAvaliableSpaces())
+                .numberOfSpacesLeft(excursionEntity.getNumberOfSpacesLeft())
                 .build();
         return excursion;
     }
@@ -41,6 +42,7 @@ public class ExcursionConverter {
                 .travelAgency(excursion.getTravelAgency())
                 .price(excursion.getPrice())
                 .numberOfAvaliableSpaces(excursion.getNumberOfAvaliableSpaces())
+                .numberOfSpacesLeft(excursion.getNumberOfSpacesLeft())
                 .build();
         return excursionEntity;
     }

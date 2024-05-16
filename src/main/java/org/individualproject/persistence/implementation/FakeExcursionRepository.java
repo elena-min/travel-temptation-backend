@@ -25,6 +25,7 @@ public class FakeExcursionRepository  {
                 new Date(), // replace with actual date
                 "Adventure Tours",
                 1500.0,
+                68,
                 68
         );
 
@@ -36,6 +37,7 @@ public class FakeExcursionRepository  {
                 new Date(), // replace with actual date
                 "City Explorers",
                 1200.0,
+                20,
                 20
         );
 
@@ -47,6 +49,7 @@ public class FakeExcursionRepository  {
                 new Date(), // replace with actual date
                 "Sunshine Travel",
                 2000.0,
+                5,
                 5
         );
 
