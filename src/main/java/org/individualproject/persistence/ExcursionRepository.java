@@ -1,6 +1,7 @@
 package org.individualproject.persistence;
 
 import org.individualproject.persistence.entity.ExcursionEntity;
+import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,5 +45,7 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
     List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceGreaterThan(String name,double price);
 
     List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceLessThan(String name, double price);
+
+    List<ExcursionEntity> findByTravelAgency(UserEntity travelAgency);
 
 }

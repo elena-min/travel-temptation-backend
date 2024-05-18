@@ -3,9 +3,11 @@ package org.individualproject.controller;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.ExcursionService;
+import org.individualproject.business.UserService;
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
+import org.individualproject.domain.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,11 @@ import java.lang.Long;
 public class ExcursionsController {
 
     private ExcursionService excursionService;
+    private UserService userService;
 
-    public ExcursionsController(ExcursionService exService){
+    public ExcursionsController(ExcursionService exService, UserService uService){
         this.excursionService = exService;
+        this.userService = uService;
     }
 
     @GetMapping("/{id}")
@@ -45,7 +49,7 @@ public class ExcursionsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
+    //@RolesAllowed({"TRAVElAGENCY", "ADMIN"})
     @DeleteMapping("/{id}")
     public ResponseEntity<Long> deleteExcursion(@PathVariable(value = "id") final Long id)
     {
@@ -55,7 +59,7 @@ public class ExcursionsController {
         return ResponseEntity.notFound().build();
     }
 
-    @RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
+    @RolesAllowed({"TRAVElAGENCY", "ADMIN"})
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateExcursionRequest request){
 
@@ -95,6 +99,18 @@ public class ExcursionsController {
         else{
             return ResponseEntity.badRequest().build();
         }
+        return ResponseEntity.ok().body(excursions);
+    }
+
+    @GetMapping("/travelAgency/{travelAgencyID}")
+    public ResponseEntity<List<Excursion>> getExcursionsByTravelAgency(@PathVariable(value = "travelAgencyID") Long travelAgency)
+    {
+        Optional<User> userOptional = userService.getUser(travelAgency);
+        if(userOptional == null){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Excursion> excursions = excursionService.getExcursionsByTravelAgency(user);
         return ResponseEntity.ok().body(excursions);
     }
 }

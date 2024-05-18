@@ -2,7 +2,6 @@ package org.individualproject.domain;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,7 +30,7 @@ public class UpdateExcursionRequest {
     private Date endDate;
 
     @NotBlank
-    private String travelAgency;
+    private User travelAgency;
 
     @Min(0)
     private double price;

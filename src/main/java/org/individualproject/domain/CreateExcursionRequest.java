@@ -31,8 +31,8 @@ public class CreateExcursionRequest {
     @Future
     private Date endDate;
 
-    @NotBlank
-    private String travelAgency;
+    @NotNull
+    private User travelAgency;
 
     @Min(0)
     private double price;

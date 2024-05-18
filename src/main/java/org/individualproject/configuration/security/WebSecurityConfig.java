@@ -36,8 +36,8 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/bookings/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/excursions/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/excursions").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/excursions/**").hasAnyRole("TRAVELINGAGENCY", "ADMIN") // Require TRAVELINGAGENCY or ADMIN role for DELETE
-                                .requestMatchers(HttpMethod.PUT, "/excursions/**").hasAnyRole("TRAVELINGAGENCY", "ADMIN") // Require TRAVELINGAGENCY or ADMIN role for PUT
+                                .requestMatchers(HttpMethod.DELETE, "/excursions/**").permitAll() // Require TRAVELINGAGENCY or ADMIN role for DELETE
+                                .requestMatchers(HttpMethod.PUT, "/excursions/**").hasAnyRole("TRAVELAGENCY", "ADMIN") // Require TRAVELINGAGENCY or ADMIN role for PUT
                                 .requestMatchers(HttpMethod.POST, "/register/user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/register/traveling-agency").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()

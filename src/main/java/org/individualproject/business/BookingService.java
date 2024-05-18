@@ -81,7 +81,7 @@ public class BookingService {
                 long twoWeeksInMillis = 14 * 24 * 60 * 60 * 1000;
                 long timeDiff = tripStartDate.getTime() - currentDate.getTime();
 
-                if(timeDiff > twoWeeksInMillis){
+                if(timeDiff < twoWeeksInMillis){
                     bookingRepository.deleteById(id);
                     return true;
                 }else{

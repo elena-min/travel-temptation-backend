@@ -1,14 +1,24 @@
 package org.individualproject.business;
 
+import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.ExcursionConverter;
+import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
+import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
+import org.individualproject.domain.User;
+import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.entity.ExcursionEntity;
+import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,12 +26,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class ExcursionService {
     private ExcursionRepository excursionRepository;
-    @Autowired
-    public ExcursionService(ExcursionRepository exRepository){
-        this.excursionRepository = exRepository;
-    }
+    private AccessToken accessToken;
     public List<Excursion> getExcursions() {
         List<ExcursionEntity> excursionEntities = excursionRepository.findAll();
         return ExcursionConverter.mapToDomainList(excursionEntities);
@@ -37,12 +45,18 @@ public class ExcursionService {
                 request.getNumberOfAvaliableSpaces() < 0) {
             throw new InvalidExcursionDataException("Invalid input data");
         }
+
+        if (!accessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+            throw new UnauthorizedDataAccessException("Only travel agencies can list excursions!");
+        }
+
+        UserEntity userEntity = UserConverter.convertToEntity(request.getTravelAgency());
         ExcursionEntity newExcursion = ExcursionEntity.builder()
                 .name(request.getName())
                 .destinations(String.join(",", request.getDestinations()))
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
-                .travelAgency(request.getTravelAgency())
+                .travelAgency(userEntity)
                 .price(request.getPrice())
                 .numberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces())
                 .numberOfSpacesLeft(request.getNumberOfAvaliableSpaces())
@@ -64,6 +78,7 @@ public class ExcursionService {
     public boolean updateExcursion(UpdateExcursionRequest request) {
         Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(request.getId());
         if (optionalExcursion.isPresent()) {
+            UserEntity userEntity = UserConverter.convertToEntity(request.getTravelAgency());
             ExcursionEntity existingExcursion = optionalExcursion.get();
             existingExcursion.setName(request.getName());
             List<String> destinations = request.getDestinations();
@@ -71,7 +86,7 @@ public class ExcursionService {
             existingExcursion.setDestinations(destinationsString);
             existingExcursion.setStartDate(request.getStartDate());
             existingExcursion.setEndDate(request.getEndDate());
-            existingExcursion.setTravelAgency(request.getTravelAgency());
+            existingExcursion.setTravelAgency(userEntity);
             existingExcursion.setPrice(request.getPrice());
             existingExcursion.setNumberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces());
             excursionRepository.save(existingExcursion);
@@ -154,6 +169,22 @@ public class ExcursionService {
         if(updatedRows == 0){
             throw new IllegalStateException("NOt enough spaces left for this excursion!");
         }
+    }
+
+    public List<Excursion> getExcursionsByTravelAgency(User travelAgency) {
+        if (!accessToken.hasRole(UserRole.ADMIN.name())) {
+            if (accessToken.getUserID() != travelAgency.getId()) {
+                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
+            }
+        }
+
+        if (!accessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+            throw new UnauthorizedDataAccessException("Only travel agencies see own listings!");
+        }
+
+        UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
+        List<ExcursionEntity> excursionEntities = excursionRepository.findByTravelAgency(userEntity);
+        return ExcursionConverter.mapToDomainList(excursionEntities);
     }
 
 }
