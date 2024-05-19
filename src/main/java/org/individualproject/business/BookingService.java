@@ -1,64 +1,96 @@
 package org.individualproject.business;
 
+import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.BookingConverter;
 import org.individualproject.business.converter.ExcursionConverter;
+import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.NotFoundException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
+import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
+import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
-import org.individualproject.persistence.UserRepository;
 import org.individualproject.persistence.entity.BookingEntity;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class BookingService {
     private BookingRepository bookingRepository;
-    @Autowired
-    public BookingService(BookingRepository bRepository){
-        this.bookingRepository = bRepository;
-    }
+    private ExcursionRepository excursionRepository;
+    private AccessToken accessToken;
+
     public List<Booking> getBookings() {
         List<BookingEntity> bookingEntities = bookingRepository.findAll();
         return BookingConverter.mapToDomainList(bookingEntities);
     }
+
     public Optional<Booking> getBooking(Long id) {
         Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
         return bookingEntity.map(BookingConverter::mapToDomain);
     }
 
-    public Booking createBooking(CreateBookingRequest createBookingRequest){
+    public Booking createBooking(CreateBookingRequest createBookingRequest) {
         UserEntity userEntity = UserConverter.convertToEntity(createBookingRequest.getUser());
         ExcursionEntity excursion = ExcursionConverter.convertToEntity(createBookingRequest.getExcursion());
-        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsEntity.builder()
-                .id(1L)
-                .build();
+        PaymentDetailsEntity paymentDetails = PaymentDetailsConverter.convertToEntity(createBookingRequest.getBankingDetails());
+
+        if(createBookingRequest.getNumberOfTravelers() > excursion.getNumberOfAvaliableSpaces()){
+            throw new IllegalStateException("Not enough spaces avaliable on this excursion!");
+        }
+
+        excursion.setNumberOfSpacesLeft(excursion.getNumberOfSpacesLeft() - createBookingRequest.getNumberOfTravelers());
+        excursionRepository.save(excursion);
+
+
         BookingEntity bookingEntity = BookingEntity.builder()
                 .user(userEntity)
                 .excursion(excursion)
                 .bookingTime(createBookingRequest.getBookingTime())
                 .status(createBookingRequest.getStatus())
-                .bankingDetails(paymentDetailsEntity)
+                .bankingDetails(paymentDetails)
                 .numberOfTravelers(createBookingRequest.getNumberOfTravelers())
                 .build();
 
         BookingEntity excursionEntity = bookingRepository.save(bookingEntity);
+
+
         return BookingConverter.mapToDomain(excursionEntity);
     }
 
     public boolean deleteBooking(Long id) {
         try {
-            bookingRepository.deleteById(id);
-            return true;
+            Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
+            if(bookingEntity.isPresent()){
+
+                BookingEntity booking = bookingEntity.get();
+                Date currentDate = new Date();
+                Date tripStartDate = booking.getExcursion().getStartDate();
+                long twoWeeksInMillis = 14 * 24 * 60 * 60 * 1000;
+                long timeDiff = tripStartDate.getTime() - currentDate.getTime();
+
+                if(timeDiff < twoWeeksInMillis){
+                    bookingRepository.deleteById(id);
+                    return true;
+                }else{
+                    throw new IllegalStateException("Cannot cancel trip. Cancellation period has passed.");
+                }
+            }else{
+                throw new NotFoundException("Booking not found.");
+            }
+
         } catch (EmptyResultDataAccessException e) {
             return false;
         }
@@ -83,6 +115,17 @@ public class BookingService {
         } else {
             return false;
         }
+    }
+
+    public List<Booking> getBookingsByUser(User user) {
+        if (!accessToken.hasRole(UserRole.ADMIN.name())) {
+            if (accessToken.getUserID() != user.getId()) {
+                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
+            }
+        }
+        UserEntity userEntity = UserConverter.convertToEntity(user);
+        List<BookingEntity> bookingEntities = bookingRepository.findByUser(userEntity);
+        return bookingEntities.stream().map(BookingConverter::mapToDomain).collect(Collectors.toList());
     }
 
 }

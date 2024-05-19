@@ -40,6 +40,7 @@ public class RegisterService {
                 .hashedPassword(hashedPassword)
                 .gender(registerRequest.getGender())
                 .birthDate(registerRequest.getBirthDate())
+                .userRoles(new HashSet<>())
                 .build();
 
         UserRoleEntity userRoleEntity = UserRoleEntity.builder()
@@ -70,10 +71,11 @@ public class RegisterService {
                 .hashedPassword(hashedPassword)
                 .gender(registerRequest.getGender())
                 .birthDate(registerRequest.getBirthDate())
+                .userRoles(new HashSet<>())
                 .build();
 
         UserRoleEntity userRoleEntity = UserRoleEntity.builder()
-                .role(UserRole.TRAVELINGAGENCY)
+                .role(UserRole.TRAVELAGENCY)
                 .user(userEntity)
                 .build();
         userEntity.getUserRoles().add(userRoleEntity);

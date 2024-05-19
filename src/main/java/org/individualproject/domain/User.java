@@ -16,9 +16,7 @@ public class User {
     private String lastName;
     private LocalDate birthDate;
     private String email;
-    private String password;
     private String hashedPassword;
-    private String salt;
     private Gender gender;
 
     @Override
@@ -29,9 +27,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", hashedPassword='" + hashedPassword + '\'' +
-                ", salt='" + salt + '\'' +
                 ", gender=" + gender +
                 '}';
     }

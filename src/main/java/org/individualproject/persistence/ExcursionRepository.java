@@ -1,6 +1,7 @@
 package org.individualproject.persistence;
 
 import org.individualproject.persistence.entity.ExcursionEntity;
+import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,6 +21,9 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
 //    boolean updateExcursion(Excursion excursionToUpdate);
 //    Optional<Excursion> getExcursionByName(String excursionName);
 
+
+    @Query("UPDATE ExcursionEntity e SET e.numberOfSpacesLeft = e.numberOfSpacesLeft - :spacesBooked WHERE e.id = :id AND e.numberOfSpacesLeft >= :spacesBooked")
+    int decrementSpacesLeft(@Param("id") Long id, @Param("spacesBooked") int spacesBooked);
 
     @Query("select e from ExcursionEntity e where e.name = ?1")
     ExcursionEntity getExcursionByName(String name);
@@ -41,5 +45,7 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
     List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceGreaterThan(String name,double price);
 
     List<ExcursionEntity> findByNameContainingIgnoreCaseAndPriceLessThan(String name, double price);
+
+    List<ExcursionEntity> findByTravelAgency(UserEntity travelAgency);
 
 }

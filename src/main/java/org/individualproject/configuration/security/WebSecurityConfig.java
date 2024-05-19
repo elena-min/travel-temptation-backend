@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,9 +31,21 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(registry ->
-                        registry.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/register/user", "/login").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/excursions", "/").permitAll()
+                        registry
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/bookings/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/excursions/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/excursions").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/excursions/**").permitAll() // Require TRAVELINGAGENCY or ADMIN role for DELETE
+                                .requestMatchers(HttpMethod.PUT, "/excursions/**").hasAnyRole("TRAVELAGENCY", "ADMIN") // Require TRAVELINGAGENCY or ADMIN role for PUT
+                                .requestMatchers(HttpMethod.POST, "/register/user").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/register/traveling-agency").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/bookings").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/payment-details/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/payment-details").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(configure -> configure.authenticationEntryPoint(authenticationEntryPoint))
@@ -42,14 +53,17 @@ public class WebSecurityConfig {
         return httpSecurity.build();
     }
 
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer(){
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/***").allowedOrigins("http://localhost:5173");
-//            }
-//        };
-//    }
+    @Bean
+    public WebMvcConfigurer corsConfigurer(){
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("http://localhost:5173")
+                        .allowedHeaders("*")
+                        .exposedHeaders("Access-Control-Allow-Origin")
+                        .allowedMethods("*");
+            }
+        };
+    }
 
 }

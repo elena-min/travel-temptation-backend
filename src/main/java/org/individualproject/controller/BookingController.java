@@ -4,6 +4,8 @@ package org.individualproject.controller;
 import jakarta.validation.Valid;
 import org.individualproject.business.BookingService;
 import org.individualproject.business.ExcursionService;
+import org.individualproject.business.UserService;
+import org.individualproject.business.converter.UserConverter;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +19,10 @@ import java.util.Optional;
 public class BookingController {
 
     private BookingService bookingService;
-
-    public BookingController(BookingService bService){
+    private UserService userService;
+    public BookingController(BookingService bService, UserService uService){
         this.bookingService = bService;
+        this.userService = uService;
     }
 
     @GetMapping("/{id}")
@@ -57,6 +60,18 @@ public class BookingController {
         request.setId(id);
         bookingService.updateBooking(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Booking>> getBookingsByUser(@PathVariable(value = "userId") final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if(userOptional == null){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Booking> bookings = bookingService.getBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
     }
 
 }

@@ -5,6 +5,10 @@ import org.individualproject.domain.Excursion;
 import org.individualproject.domain.PaymentDetails;
 import org.individualproject.domain.User;
 import org.individualproject.persistence.entity.BookingEntity;
+import org.individualproject.persistence.entity.ExcursionEntity;
+import org.individualproject.persistence.entity.PaymentDetailsEntity;
+import org.individualproject.persistence.entity.UserEntity;
+
 import java.util.List;
 
 public class BookingConverter {
@@ -29,6 +33,22 @@ public class BookingConverter {
         return bookingEntities.stream()
                 .map(BookingConverter::mapToDomain)
                 .toList();
+    }
+
+    public static BookingEntity convertToEntity(Booking booking){
+        UserEntity userEntity = UserConverter.convertToEntity(booking.getUser());
+        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsConverter.convertToEntity(booking.getBankingDetails());
+        ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(booking.getExcursion());
+        BookingEntity bookingEntity = BookingEntity.builder()
+                .id(booking.getId())
+                .user(userEntity)
+                .bankingDetails(paymentDetailsEntity)
+                .bookingTime(booking.getBookingTime())
+                .excursion(excursionEntity)
+                .numberOfTravelers(booking.getNumberOfTravelers())
+                .status(booking.getStatus())
+                .build();
+        return bookingEntity;
     }
 
     private BookingConverter(){}

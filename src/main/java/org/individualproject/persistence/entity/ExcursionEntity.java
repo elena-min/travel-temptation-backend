@@ -39,9 +39,9 @@ public class ExcursionEntity {
     @Column(name = "endDate")
     private Date endDate;
 
-    @NotNull
-    @Column(name = "travelAgency")
-    private String travelAgency;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "travelAgency_id")
+    private UserEntity travelAgency;
 
     @NotNull
     @Min(0)
@@ -51,5 +51,9 @@ public class ExcursionEntity {
     @NotNull
     @Column(name = "numberOfAvaliableSpaces")
     private int numberOfAvaliableSpaces;
+
+    @NotNull
+    @Column(name = "numberOfSpacesLeft")
+    private int numberOfSpacesLeft;
 
 }

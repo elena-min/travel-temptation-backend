@@ -16,43 +16,46 @@ public class FakeExcursionRepository  {
 
     public FakeExcursionRepository() {
         this.excursions = new ArrayList<>();
-        nextId = 1L;
-        excursion1 = new Excursion(
-                nextId++,
-                "Mountain Hike",
-                Arrays.asList("Mount Everest Base Camp", "Annapurna Circuit"),
-                new Date(), // replace with actual date
-                new Date(), // replace with actual date
-                "Adventure Tours",
-                1500.0,
-                68
-        );
-
-        excursion2 = new Excursion(
-                nextId++,
-                "City Tour",
-                Arrays.asList("Paris", "Rome", "Barcelona"),
-                new Date(), // replace with actual date
-                new Date(), // replace with actual date
-                "City Explorers",
-                1200.0,
-                20
-        );
-
-        excursion3 = new Excursion(
-                nextId++,
-                "Beach Getaway",
-                Arrays.asList("Maldives", "Phuket", "Bora Bora"),
-                new Date(), // replace with actual date
-                new Date(), // replace with actual date
-                "Sunshine Travel",
-                2000.0,
-                5
-        );
-
-        excursions.add(excursion1);
-        excursions.add(excursion2);
-        excursions.add(excursion3);
+//        nextId = 1L;
+//        excursion1 = new Excursion(
+//                nextId++,
+//                "Mountain Hike",
+//                Arrays.asList("Mount Everest Base Camp", "Annapurna Circuit"),
+//                new Date(), // replace with actual date
+//                new Date(), // replace with actual date
+//                "Adventure Tours",
+//                1500.0,
+//                68,
+//                68
+//        );
+//
+//        excursion2 = new Excursion(
+//                nextId++,
+//                "City Tour",
+//                Arrays.asList("Paris", "Rome", "Barcelona"),
+//                new Date(), // replace with actual date
+//                new Date(), // replace with actual date
+//                "City Explorers",
+//                1200.0,
+//                20,
+//                20
+//        );
+//
+//        excursion3 = new Excursion(
+//                nextId++,
+//                "Beach Getaway",
+//                Arrays.asList("Maldives", "Phuket", "Bora Bora"),
+//                new Date(), // replace with actual date
+//                new Date(), // replace with actual date
+//                "Sunshine Travel",
+//                2000.0,
+//                5,
+//                5
+//        );
+//
+//        excursions.add(excursion1);
+//        excursions.add(excursion2);
+//        excursions.add(excursion3);
     }
 
 
