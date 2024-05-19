@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,8 +38,7 @@ class BookingConverterTest {
                 .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .hashedPassword("asdfgh")
-                .salt("asdfghjkl")
-                .gender(Gender.Male)
+                .gender(Gender.MALE)
                 .build();
 
         User user = UserConverter.mapToDomain(userEntity);
@@ -50,7 +50,7 @@ class BookingConverterTest {
                 .destinations("Rome.Florance")
                 .startDate(new Date(124, 4, 16))
                 .endDate(new Date(124, 4, 26))
-                .travelAgency("Agency 1")
+                .travelAgency(userEntity)
                 .price(100.00)
                 .numberOfAvaliableSpaces(30)
                 .build();
@@ -98,8 +98,7 @@ class BookingConverterTest {
                 .birthDate(date)
                 .email("nickJonas@gmail.com")
                 .hashedPassword("asdfgh")
-                .salt("asdfghjkl")
-                .gender(Gender.Male)
+                .gender(Gender.MALE)
                 .build();
 
         User user = UserConverter.mapToDomain(userEntity);
@@ -111,7 +110,7 @@ class BookingConverterTest {
                 .destinations("Rome.Florance")
                 .startDate(new Date(124, 4, 16))
                 .endDate(new Date(124, 4, 26))
-                .travelAgency("Agency 1")
+                .travelAgency(userEntity)
                 .price(100.00)
                 .numberOfAvaliableSpaces(30)
                 .build();
@@ -145,4 +144,67 @@ class BookingConverterTest {
         assertEquals(bookingEntity.getStatus(), booking.getStatus());
 
     }
+
+    @Test
+    void convertToEntity(){
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        LocalDateTime bookingDateTime = LocalDateTime.of(2024, Month.MAY, 19, 12, 0);
+
+        User user = User.builder()
+                .id(1L)
+                .firstName("Nick")
+                .lastName("Jonas")
+                .birthDate(date)
+                .email("nickJonas@gmail.com")
+                .hashedPassword("asdfgh")
+                .gender(Gender.MALE)
+                .build();
+
+        PaymentDetails paymentDetails = PaymentDetails.builder()
+                .id(1L)
+                .user(user)
+                .cvv("234")
+                .cardHolderName("Nick Jonas")
+                .cardNumber("1234567890123456")
+                .expirationDate(date)
+                .build();
+
+        List<String> destinations = new ArrayList<>();
+        destinations.add("Rome");
+        destinations.add("Florance");
+        Excursion excursion = Excursion.builder()
+                .id(1L)
+                .name("City Tour")
+                .destinations(destinations)
+                .startDate(new Date(124, 4, 16))
+                .endDate(new Date(124, 4, 26))
+                .travelAgency(user)
+                .price(100.00)
+                .numberOfAvaliableSpaces(30)
+                .build();
+
+        Booking booking = Booking.builder()
+                .id(1L)
+                .bookingTime(bookingDateTime)
+                .excursion(excursion)
+                .numberOfTravelers(5)
+                .status(BookingStatus.PENDING)
+                .bankingDetails(paymentDetails)
+                .user(user)
+                .build();
+
+        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsConverter.convertToEntity(paymentDetails);
+        UserEntity expectedUser = UserConverter.convertToEntity(user);
+        ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(excursion);
+        BookingEntity bookingEntity = BookingConverter.convertToEntity(booking);
+        //Assert
+        assertEquals(booking.getId(), bookingEntity.getId());
+        assertEquals(booking.getBookingTime(), bookingEntity.getBookingTime());
+        assertEquals(booking.getStatus(), bookingEntity.getStatus());
+        assertEquals(booking.getNumberOfTravelers(), bookingEntity.getNumberOfTravelers());
+        assertEquals(paymentDetailsEntity, bookingEntity.getBankingDetails());
+        assertEquals(expectedUser, bookingEntity.getUser());
+        assertEquals(excursionEntity, bookingEntity.getExcursion());
+    }
+
 }

@@ -5,6 +5,7 @@ import org.individualproject.business.converter.BookingConverter;
 import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
@@ -43,6 +44,10 @@ public class BookingService {
     }
 
     public Booking createBooking(CreateBookingRequest createBookingRequest) {
+        if (createBookingRequest.getNumberOfTravelers() < 0 || createBookingRequest.getBookingTime() == null || createBookingRequest.getBankingDetails() == null ||
+                createBookingRequest.getStatus() == null || createBookingRequest.getUser() == null || createBookingRequest.getExcursion() == null) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
         UserEntity userEntity = UserConverter.convertToEntity(createBookingRequest.getUser());
         ExcursionEntity excursion = ExcursionConverter.convertToEntity(createBookingRequest.getExcursion());
         PaymentDetailsEntity paymentDetails = PaymentDetailsConverter.convertToEntity(createBookingRequest.getBankingDetails());
@@ -81,12 +86,13 @@ public class BookingService {
                 long twoWeeksInMillis = 14 * 24 * 60 * 60 * 1000;
                 long timeDiff = tripStartDate.getTime() - currentDate.getTime();
 
-                if(timeDiff < twoWeeksInMillis){
+                if (timeDiff < twoWeeksInMillis) {
+                    throw new IllegalStateException("Cannot cancel trip. Cancellation period has passed.");
+                } else {
                     bookingRepository.deleteById(id);
                     return true;
-                }else{
-                    throw new IllegalStateException("Cannot cancel trip. Cancellation period has passed.");
                 }
+
             }else{
                 throw new NotFoundException("Booking not found.");
             }
@@ -98,9 +104,7 @@ public class BookingService {
 
     public boolean updateBooking(UpdateBookingRequest updateBookingRequest) {
         ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(updateBookingRequest.getExcursion());
-        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsEntity.builder()
-                .id(1L)
-                .build();
+        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsConverter.convertToEntity(updateBookingRequest.getBankingDetails());
 
         Optional<BookingEntity> optionalBooking = bookingRepository.findById(updateBookingRequest.getId());
         if (optionalBooking.isPresent()) {

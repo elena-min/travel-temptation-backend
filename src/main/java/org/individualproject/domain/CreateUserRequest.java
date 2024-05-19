@@ -34,8 +34,6 @@ public class CreateUserRequest {
     @Size(min= 6)
     private String password;
 
-    @NotBlank
-    private String hashedPassword;
 
     @NotNull
     private Gender gender;

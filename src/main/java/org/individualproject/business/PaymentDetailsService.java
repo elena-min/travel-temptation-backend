@@ -2,6 +2,7 @@ package org.individualproject.business;
 
 import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.domain.*;
 import org.individualproject.persistence.PaymentDetailsRepository;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
@@ -30,6 +31,10 @@ public class PaymentDetailsService {
     }
 
     public PaymentDetails createPaymentDetails(CreatePaymentDetailsRequest request){
+        if (request.getCardHolderName() == null || request.getCardNumber() == null || request.getCvv() == null ||
+                request.getUser() == null || request.getExpirationDate() == null) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
         UserEntity userEntity = UserConverter.convertToEntity(request.getUser());
         PaymentDetailsEntity newPaymentDetails = PaymentDetailsEntity.builder()
                 .user(userEntity)

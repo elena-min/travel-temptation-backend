@@ -167,11 +167,12 @@ public class ExcursionService {
     public void bookSpaces(Long id, int spacesBooked){
         int updatedRows = excursionRepository.decrementSpacesLeft(id, spacesBooked);
         if(updatedRows == 0){
-            throw new IllegalStateException("NOt enough spaces left for this excursion!");
+            throw new IllegalStateException("Not enough spaces left for this excursion!");
         }
     }
 
     public List<Excursion> getExcursionsByTravelAgency(User travelAgency) {
+
         if (!accessToken.hasRole(UserRole.ADMIN.name())) {
             if (accessToken.getUserID() != travelAgency.getId()) {
                 throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
@@ -186,5 +187,6 @@ public class ExcursionService {
         List<ExcursionEntity> excursionEntities = excursionRepository.findByTravelAgency(userEntity);
         return ExcursionConverter.mapToDomainList(excursionEntities);
     }
+
 
 }

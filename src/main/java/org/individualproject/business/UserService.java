@@ -37,12 +37,17 @@ public class UserService {
                 .lastName(request.getLastName())
                 .birthDate(request.getBirthDate())
                 .email(request.getEmail())
-                .hashedPassword(request.getHashedPassword())
+                .hashedPassword(request.getPassword())
                 .gender(request.getGender())
                 .build();
 
         UserEntity userEntity = userRepository.save(newUser);
-        return UserConverter.mapToDomain(userEntity);
+        if (userEntity != null) {
+            return UserConverter.mapToDomain(userEntity);
+        } else {
+            return null; // Return null if the saved entity is null
+        }
+        //return UserConverter.mapToDomain(userEntity);
     }
 
     public boolean deleteUser(Long id) {
