@@ -78,7 +78,6 @@ public class ExcursionService {
     public boolean updateExcursion(UpdateExcursionRequest request) {
         Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(request.getId());
         if (optionalExcursion.isPresent()) {
-            UserEntity userEntity = UserConverter.convertToEntity(request.getTravelAgency());
             ExcursionEntity existingExcursion = optionalExcursion.get();
             existingExcursion.setName(request.getName());
             List<String> destinations = request.getDestinations();
@@ -86,7 +85,6 @@ public class ExcursionService {
             existingExcursion.setDestinations(destinationsString);
             existingExcursion.setStartDate(request.getStartDate());
             existingExcursion.setEndDate(request.getEndDate());
-            existingExcursion.setTravelAgency(userEntity);
             existingExcursion.setPrice(request.getPrice());
             existingExcursion.setNumberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces());
             excursionRepository.save(existingExcursion);

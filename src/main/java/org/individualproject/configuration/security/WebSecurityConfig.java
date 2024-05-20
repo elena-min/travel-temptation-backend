@@ -36,13 +36,14 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/bookings/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/excursions/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/excursions").permitAll()
-                                .requestMatchers(HttpMethod.DELETE, "/excursions/**").permitAll() // Require TRAVELINGAGENCY or ADMIN role for DELETE
-                                .requestMatchers(HttpMethod.PUT, "/excursions/**").hasAnyRole("TRAVELAGENCY", "ADMIN") // Require TRAVELINGAGENCY or ADMIN role for PUT
+                                .requestMatchers(HttpMethod.DELETE, "/excursions/**").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/excursions/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/register/user").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/register/traveling-agency").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/login").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                                .requestMatchers(HttpMethod.PUT, "/users/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/bookings").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/payment-details/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/payment-details").permitAll()

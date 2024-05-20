@@ -59,7 +59,7 @@ public class ExcursionsController {
         return ResponseEntity.notFound().build();
     }
 
-    @RolesAllowed({"TRAVElAGENCY", "ADMIN"})
+   // @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateExcursionRequest request){
 

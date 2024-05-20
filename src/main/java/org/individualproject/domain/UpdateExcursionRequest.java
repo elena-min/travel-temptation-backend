@@ -29,9 +29,6 @@ public class UpdateExcursionRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;
 
-    @NotBlank
-    private User travelAgency;
-
     @Min(0)
     private double price;
 
