@@ -15,8 +15,8 @@ sonar {
     properties {
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.projectKey", "Individual-Project"
-        property "sonar.projectName", "Individual Project"
+        property "sonar.projectKey", "Travel-Temptation"
+        property "sonar.projectName", "Travel Temptation"
         property "sonar.qualitygate.wait", true
         property "sonar.token", "sqp_b8ff1b24aa5554863150aa6fdaed35c999d4f986"
         property "sonar.coverage.exclusions", "**/domain/**, **/configuration/**, **/controller/**"

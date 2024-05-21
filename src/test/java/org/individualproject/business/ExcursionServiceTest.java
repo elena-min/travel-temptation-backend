@@ -223,7 +223,7 @@ class ExcursionServiceTest {
                 Arrays.asList("Paris", "London"),
                 startDate,
                 endDate,
-                user,
+
                 1000.0,
                 23
                 );
@@ -259,7 +259,6 @@ class ExcursionServiceTest {
                 Arrays.asList("Paris", "London"),
                 startDate,
                 endDate,
-                user,
                 1000.0,
                 23
         );
