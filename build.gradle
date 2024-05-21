@@ -18,7 +18,7 @@ sonar {
         property "sonar.projectKey", "Travel-Temptation"
         property "sonar.projectName", "Travel Temptation"
         property "sonar.qualitygate.wait", true
-        property "sonar.token", "sqp_b8ff1b24aa5554863150aa6fdaed35c999d4f986"
+        property "sonar.token", "sqp_2e9296119fe9fcabbf7e30760d3d708ec122c4d1"
         property "sonar.coverage.exclusions", "**/domain/**, **/configuration/**, **/controller/**"
 
     }
