@@ -1,11 +1,8 @@
 package org.individualproject.business;
 
-import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.domain.*;
-import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.UserRepository;
-import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -42,12 +39,11 @@ public class UserService {
                 .build();
 
         UserEntity userEntity = userRepository.save(newUser);
-        if (userEntity != null) {
+        if (userEntity.getId() != null) {
             return UserConverter.mapToDomain(userEntity);
         } else {
             return null; // Return null if the saved entity is null
         }
-        //return UserConverter.mapToDomain(userEntity);
     }
 
     public boolean deleteUser(Long id) {

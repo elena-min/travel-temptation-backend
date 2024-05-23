@@ -130,7 +130,16 @@ class UserServiceTest {
                 "123",
                 Gender.MALE
         );
-        when(userRepository.save(any(UserEntity.class))).thenReturn(null);
+
+        UserEntity userEntity = UserEntity.builder()
+                .firstName(userRequest.getFirstName())
+                .lastName(userRequest.getLastName())
+                .birthDate(userRequest.getBirthDate())
+                .email(userRequest.getEmail())
+                .hashedPassword(userRequest.getPassword())
+                .gender(userRequest.getGender())
+                .build();
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
         // Act
         User actual = userService.createUser(userRequest);

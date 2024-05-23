@@ -1,7 +1,6 @@
 package org.individualproject.business;
 
 import lombok.AllArgsConstructor;
-import org.individualproject.business.exception.InvalidCredentialsException;
 import org.individualproject.business.exception.UsernameAlreadyExistsException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.configuration.security.token.AccessTokenEncoder;

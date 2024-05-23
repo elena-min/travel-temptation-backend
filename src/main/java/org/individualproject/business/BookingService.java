@@ -69,10 +69,10 @@ public class BookingService {
                 .numberOfTravelers(createBookingRequest.getNumberOfTravelers())
                 .build();
 
-        BookingEntity excursionEntity = bookingRepository.save(bookingEntity);
+        BookingEntity bookingEntity1 = bookingRepository.save(bookingEntity);
 
 
-        return BookingConverter.mapToDomain(excursionEntity);
+        return BookingConverter.mapToDomain(bookingEntity1);
     }
 
     public boolean deleteBooking(Long id) {

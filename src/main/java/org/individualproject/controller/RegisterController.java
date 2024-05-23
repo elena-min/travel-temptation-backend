@@ -2,10 +2,8 @@ package org.individualproject.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.individualproject.business.LoginService;
 import org.individualproject.business.RegisterService;
 import org.individualproject.domain.LoginRegisterResponse;
-import org.individualproject.domain.LoginRequest;
 import org.individualproject.domain.RegisterRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

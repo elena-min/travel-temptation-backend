@@ -1,9 +1,7 @@
 package org.individualproject.business.converter;
 
-import org.individualproject.domain.Excursion;
 import org.individualproject.domain.PaymentDetails;
 import org.individualproject.domain.User;
-import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
 
@@ -15,7 +13,7 @@ public class PaymentDetailsConverter {
     public static PaymentDetails mapToDomain(PaymentDetailsEntity paymentDetailsEntity) {
         UserEntity userEntity = paymentDetailsEntity.getUser();
         User user = UserConverter.mapToDomain(userEntity);
-        PaymentDetails paymentDetails = PaymentDetails.builder()
+        return PaymentDetails.builder()
                 .id(paymentDetailsEntity.getId())
                 .user(user)
                 .expirationDate(paymentDetailsEntity.getExpirationDate())
@@ -23,7 +21,6 @@ public class PaymentDetailsConverter {
                 .cardHolderName(paymentDetailsEntity.getCardHolderName())
                 .cvv(paymentDetailsEntity.getCvv())
                 .build();
-        return paymentDetails;
     }
     public static List<PaymentDetails> mapToDomainList(List<PaymentDetailsEntity> paymentDetailsEntities) {
         return paymentDetailsEntities.stream()
@@ -32,7 +29,7 @@ public class PaymentDetailsConverter {
     }
     public static PaymentDetailsEntity convertToEntity(PaymentDetails paymentDetails){
         UserEntity userEntity = UserConverter.convertToEntity(paymentDetails.getUser());
-        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsEntity.builder()
+        return PaymentDetailsEntity.builder()
                 .id(paymentDetails.getId())
                 .user(userEntity)
                 .cardHolderName(paymentDetails.getCardHolderName())
@@ -40,7 +37,6 @@ public class PaymentDetailsConverter {
                 .cvv(paymentDetails.getCvv())
                 .expirationDate(paymentDetails.getExpirationDate())
                 .build();
-        return paymentDetailsEntity;
     }
 
 

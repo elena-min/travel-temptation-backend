@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.individualproject.domain.Excursion;
-import org.individualproject.domain.PaymentDetails;
-import org.individualproject.domain.User;
 import org.individualproject.domain.enums.BookingStatus;
 
 import java.time.LocalDateTime;

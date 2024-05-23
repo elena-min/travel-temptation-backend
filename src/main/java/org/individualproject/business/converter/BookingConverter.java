@@ -18,7 +18,7 @@ public class BookingConverter {
         Excursion excursion = ExcursionConverter.mapToDomain(bookingEntity.getExcursion());
         PaymentDetails paymentDetails = PaymentDetailsConverter.mapToDomain(bookingEntity.getBankingDetails());
 
-        Booking booking = Booking.builder()
+        return Booking.builder()
                 .id(bookingEntity.getId())
                 .user(user)
                 .excursion(excursion)
@@ -27,7 +27,6 @@ public class BookingConverter {
                 .bankingDetails(paymentDetails)
                 .numberOfTravelers(bookingEntity.getNumberOfTravelers())
                 .build();
-        return booking;
     }
     public static List<Booking> mapToDomainList(List<BookingEntity> bookingEntities) {
         return bookingEntities.stream()
@@ -39,7 +38,7 @@ public class BookingConverter {
         UserEntity userEntity = UserConverter.convertToEntity(booking.getUser());
         PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsConverter.convertToEntity(booking.getBankingDetails());
         ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(booking.getExcursion());
-        BookingEntity bookingEntity = BookingEntity.builder()
+        return BookingEntity.builder()
                 .id(booking.getId())
                 .user(userEntity)
                 .bankingDetails(paymentDetailsEntity)
@@ -48,7 +47,6 @@ public class BookingConverter {
                 .numberOfTravelers(booking.getNumberOfTravelers())
                 .status(booking.getStatus())
                 .build();
-        return bookingEntity;
     }
 
     private BookingConverter(){}

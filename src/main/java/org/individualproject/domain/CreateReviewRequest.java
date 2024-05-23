@@ -1,6 +1,7 @@
 package org.individualproject.domain;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,28 +11,31 @@ import org.individualproject.domain.enums.BookingStatus;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateBookingRequest {
-    @NotNull
-    private User user;
+public class CreateReviewRequest {
 
     @NotNull
-    private  Excursion excursion;
+    private User travelAgency;
+
+    @NotNull
+    private User userWriter;
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime bookingTime;
+    private Date reviewDate;
 
-    @NotNull
-    private BookingStatus status;
+    @Min(1)
+    private int numberOfStars;
 
-    @NotNull
-    private PaymentDetails bankingDetails;
+    @NotEmpty
+    private String title;
 
-    @Min(0)
-    private int numberOfTravelers;
+    @NotEmpty
+    private String description;
 }
+

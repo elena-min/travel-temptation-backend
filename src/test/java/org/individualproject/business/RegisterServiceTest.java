@@ -85,7 +85,7 @@ class RegisterServiceTest {
         String accessToken = "generatedAccessToken";
         when(accessTokenEncoderDecoder.encode(any(AccessToken.class))).thenReturn(accessToken);
 
-        LoginRegisterResponse response = registerService.registerUser(registerRequest);
+        LoginRegisterResponse response = registerService.registerTravelingAgency(registerRequest);
 
         assertNotNull(response);
         assertEquals(accessToken, response.getAccessToken());
@@ -98,6 +98,6 @@ class RegisterServiceTest {
 
         when(userRepository.existsByUsername(registerRequest.getUsername())).thenReturn(true);
 
-        assertThrows(UsernameAlreadyExistsException.class, () -> registerService.registerUser(registerRequest));
+        assertThrows(UsernameAlreadyExistsException.class, () -> registerService.registerTravelingAgency(registerRequest));
     }
 }

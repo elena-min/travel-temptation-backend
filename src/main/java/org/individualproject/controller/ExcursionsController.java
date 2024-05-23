@@ -1,6 +1,5 @@
 package org.individualproject.controller;
 
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;

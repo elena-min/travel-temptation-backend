@@ -13,7 +13,7 @@ public class ExcursionConverter {
     public static Excursion mapToDomain(ExcursionEntity excursionEntity) {
         List<String> destinations = Arrays.asList(excursionEntity.getDestinations().split(","));
         User travelAgency = UserConverter.mapToDomain(excursionEntity.getTravelAgency());
-        Excursion excursion = Excursion.builder()
+        return Excursion.builder()
                 .id(excursionEntity.getId())
                 .name(excursionEntity.getName())
                 .destinations(destinations)
@@ -24,7 +24,6 @@ public class ExcursionConverter {
                 .numberOfAvaliableSpaces(excursionEntity.getNumberOfAvaliableSpaces())
                 .numberOfSpacesLeft(excursionEntity.getNumberOfSpacesLeft())
                 .build();
-        return excursion;
     }
     public static List<Excursion> mapToDomainList(List<ExcursionEntity> excursionEntities) {
         return excursionEntities.stream()
@@ -35,7 +34,7 @@ public class ExcursionConverter {
     public static ExcursionEntity convertToEntity(Excursion excursion){
         String destinationsAsString = String.join(",", excursion.getDestinations());
         UserEntity travelAgency = UserConverter.convertToEntity(excursion.getTravelAgency());
-        ExcursionEntity excursionEntity = ExcursionEntity.builder()
+        return ExcursionEntity.builder()
                 .id(excursion.getId())
                 .name(excursion.getName())
                 .destinations(destinationsAsString)
@@ -46,7 +45,6 @@ public class ExcursionConverter {
                 .numberOfAvaliableSpaces(excursion.getNumberOfAvaliableSpaces())
                 .numberOfSpacesLeft(excursion.getNumberOfSpacesLeft())
                 .build();
-        return excursionEntity;
     }
 
     private ExcursionConverter(){}

@@ -14,11 +14,7 @@ import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

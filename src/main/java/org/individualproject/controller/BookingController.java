@@ -3,9 +3,7 @@ package org.individualproject.controller;
 
 import jakarta.validation.Valid;
 import org.individualproject.business.BookingService;
-import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
-import org.individualproject.business.converter.UserConverter;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
