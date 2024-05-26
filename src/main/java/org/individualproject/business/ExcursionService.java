@@ -167,16 +167,6 @@ public class ExcursionService {
 
     public List<Excursion> getExcursionsByTravelAgency(User travelAgency) {
 
-        if (!accessToken.hasRole(UserRole.ADMIN.name())) {
-            if (accessToken.getUserID() != travelAgency.getId()) {
-                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
-            }
-        }
-
-        if (!accessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
-            throw new UnauthorizedDataAccessException("Only travel agencies see own listings!");
-        }
-
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
         List<ExcursionEntity> excursionEntities = excursionRepository.findByTravelAgency(userEntity);
         return ExcursionConverter.mapToDomainList(excursionEntities);

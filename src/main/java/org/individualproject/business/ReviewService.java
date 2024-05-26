@@ -77,13 +77,14 @@ public class ReviewService {
     }
 
     public List<Review> getReviewsByUser(User user) {
-        if (!accessToken.hasRole(UserRole.ADMIN.name())) {
-            if (accessToken.getUserID() != user.getId()) {
-                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
-            }
-        }
         UserEntity userEntity = UserConverter.convertToEntity(user);
         List<ReviewEntity> reviewEntities = reviewRepository.findByUserWriter(userEntity);
+        return reviewEntities.stream().map(ReviewConverter::mapToDomain).collect(Collectors.toList());
+    }
+
+    public List<Review> getReviewsByTravelAgency(User travelAgency) {
+        UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
+        List<ReviewEntity> reviewEntities = reviewRepository.findByTravelAgency(userEntity);
         return reviewEntities.stream().map(ReviewConverter::mapToDomain).collect(Collectors.toList());
     }
 

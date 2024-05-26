@@ -47,6 +47,7 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/bookings").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/payment-details/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/payment-details").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(configure -> configure.authenticationEntryPoint(authenticationEntryPoint))

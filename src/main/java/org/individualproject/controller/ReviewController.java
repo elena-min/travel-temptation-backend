@@ -62,4 +62,16 @@ public class ReviewController {
         List<Review> reviews = reviewService.getReviewsByUser(user);
         return ResponseEntity.ok().body(reviews);
     }
+
+    @GetMapping("/travelagency/{travelAgencyId}")
+    public ResponseEntity<List<Review>> getReviewsByTravelAgency(@PathVariable(value = "travelAgencyId") final Long travelAgencyId)
+    {
+        Optional<User> userOptional = userService.getUser(travelAgencyId);
+        if(userOptional == null){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Review> reviews = reviewService.getReviewsByTravelAgency(user);
+        return ResponseEntity.ok().body(reviews);
+    }
 }
