@@ -1,5 +1,6 @@
 package org.individualproject.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
 import org.individualproject.business.ReviewService;
@@ -30,19 +31,21 @@ public class ReviewController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping()
-    public ResponseEntity<List<Review>> getBookings()
+    public ResponseEntity<List<Review>> geReviews()
     {
         List<Review> reviews = reviewService.getReviews();
         return ResponseEntity.ok().body(reviews);
     }
 
     @PostMapping()
+    @RolesAllowed({"USER"})
     public ResponseEntity<Review> createReview(@RequestBody @Valid CreateReviewRequest request) {
         Review response = reviewService.createReview(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
+    @RolesAllowed({"USER", "ADMIN"})
     public ResponseEntity<Long> deleteReview(@PathVariable(value = "id") final Long id)
     {
         if (reviewService.deleteReview(id)) {

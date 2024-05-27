@@ -382,10 +382,6 @@ class ExcursionServiceTest {
         Date endDate = new Date(2028, 9, 24);
         User travelAgency = User.builder().id(1L).firstName("Travel").lastName("Agency").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
 
-        //User travelAgency = new User(1L, "Travel Agency", "Agency", null, null, null, null);
-        when(accessToken.hasRole(UserRole.ADMIN.name())).thenReturn(false);
-        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
-        when(accessToken.getUserID()).thenReturn(travelAgency.getId());
 
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
         List<ExcursionEntity> excursionEntities = Arrays.asList(

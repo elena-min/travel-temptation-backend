@@ -1,6 +1,7 @@
 package org.individualproject.controller;
 
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.BookingService;
 import org.individualproject.business.UserService;
@@ -38,12 +39,14 @@ public class BookingController {
     }
 
     @PostMapping()
+    @RolesAllowed({"USER"})
     public ResponseEntity<Booking> createBooking(@RequestBody @Valid CreateBookingRequest request) {
         Booking response = bookingService.createBooking(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Long> deleteBooking(@PathVariable(value = "id") final Long id)
     {
         if (bookingService.deleteBooking(id)) {
