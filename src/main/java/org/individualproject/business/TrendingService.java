@@ -6,7 +6,6 @@ import org.individualproject.business.converter.ReviewConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.Review;
-import org.individualproject.domain.User;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.ReviewRepository;
@@ -15,11 +14,9 @@ import org.individualproject.persistence.entity.ReviewEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -30,16 +27,21 @@ public class TrendingService {
     private  BookingRepository bookingRepository;
 
     public List<Excursion> getTrendingExcursion(int limit) {
+        Date today = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.MONTH, 6);
+
         List<Excursion> allExcursions = excursionRepository.findAll().stream()
                                         .map(ExcursionConverter::mapToDomain)
-                                        .collect(Collectors.toList());
-        List<Excursion> trendingExcursions = allExcursions.stream()
-                                            .map(this::calculateTrendinessScore)
-                                            .sorted(Comparator.comparingDouble((Map.Entry<Excursion, Double> entry) -> entry.getValue()).reversed())
-                                            .limit(limit)
-                                            .map(Map.Entry::getKey)
-                                            .collect(Collectors.toList());
-        return trendingExcursions;
+                                        .filter(excursion -> isAfterToday(excursion.getStartDate()) && isBeforeSixMonthsFromToday(excursion.getStartDate()))
+                                        .toList();
+        return allExcursions.stream()
+                .map(this::calculateTrendinessScore)
+                .sorted(Comparator.comparingDouble((Map.Entry<Excursion, Double> entry) -> entry.getValue()).reversed())
+                .limit(limit)
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     private Map.Entry<Excursion, Double> calculateTrendinessScore(Excursion excursion){
@@ -55,8 +57,20 @@ public class TrendingService {
         ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(excursion);
         int totalBookings = bookingRepository.findByExcursion(excursionEntity).size();
 
-        double trendinessScore = (int) (averageRating * 0.5 + totalBookings * 05);
+        double trendinessScore = (int) (averageRating * 0.5 + totalBookings * 0.5);
 
         return Map.entry(excursion, trendinessScore);
+    }
+    private boolean isAfterToday(Date date) {
+        LocalDate today = LocalDate.now();
+        LocalDate dateToCheck = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return dateToCheck.isAfter(today);
+    }
+
+    private boolean isBeforeSixMonthsFromToday(Date date) {
+        LocalDate today = LocalDate.now();
+        LocalDate sixMonthsFromToday = today.plusMonths(6);
+        LocalDate dateToCheck = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return dateToCheck.isBefore(sixMonthsFromToday);
     }
 }

@@ -123,7 +123,6 @@ class PaymentDetailsServiceTest {
         request.setCardHolderName("Nick Jonas");
         request.setCvv("123");
 
-        // Mocking the repository behavior
         PaymentDetailsEntity savedPaymentDetailsEntity = PaymentDetailsEntity.builder()
                 .id(1L)
                 .expirationDate(request.getExpirationDate())
@@ -134,13 +133,9 @@ class PaymentDetailsServiceTest {
                 .build();
         when(paymentDetailsRepository.save(any())).thenReturn(savedPaymentDetailsEntity);
 
-        // Calling the method under test
         PaymentDetails result = paymentDetailsService.createPaymentDetails(request);
 
-        // Verifying that the repository method was called with the correct argument
         verify(paymentDetailsRepository).save(any());
-
-        // Asserting the result
         assertEquals(savedPaymentDetailsEntity.getId(), result.getId());
         assertEquals(savedPaymentDetailsEntity.getExpirationDate(), result.getExpirationDate());
         assertEquals(savedPaymentDetailsEntity.getCardNumber(), result.getCardNumber());
@@ -157,7 +152,7 @@ class PaymentDetailsServiceTest {
 
     private static Stream<Arguments> provideStringsForIsParams() {
         LocalDate expDate = LocalDate.of(2027, 9, 16);
-        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "hashedPassword1", Gender.MALE);
+        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "johnDoe","hashedPassword1", Gender.MALE);
 
         return Stream.of(
                 Arguments.of(new CreatePaymentDetailsRequest(null, "1234567890123456", "234", expDate, "Nick Jonas")),
@@ -244,7 +239,7 @@ class PaymentDetailsServiceTest {
 
         when(paymentDetailsRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act:
+        // Act
         boolean updateResult = paymentDetailsService.updatePaymentDetails(request);
 
         // Assert

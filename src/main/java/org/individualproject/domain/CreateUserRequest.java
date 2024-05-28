@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.individualproject.domain.enums.Gender;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -29,6 +30,10 @@ public class CreateUserRequest {
     @NotBlank
     @Email
     private String email;
+
+    @NotBlank
+    @Length(min = 2, max = 20)
+    private String username;
 
     @NotBlank
     @Size(min= 6)

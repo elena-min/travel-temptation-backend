@@ -1,8 +1,6 @@
 package org.individualproject.controller;
 
-import org.individualproject.business.BookingService;
 import org.individualproject.business.TrendingService;
-import org.individualproject.business.UserService;
 import org.individualproject.domain.Excursion;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

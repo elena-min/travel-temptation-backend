@@ -39,14 +39,14 @@ class UserServiceTest {
         //Arrange
         LocalDate date = LocalDate.of(2014, 9, 16);
         List<User> expected =  Arrays.asList(
-                new User(1L, "John", "Doe", date, "j.doe@example.com", "hashedPassword1", Gender.MALE ),
-                new User(2L, "Eve", "McDonalds", date, "e.mcdonalds@example.com", "hashedPassword2", Gender.FEMALE),
-                new User(3L, "Donald", "Duck", date, "d.duck@example.com", "hashedPassword3",  Gender.MALE)
+                new User(1L, "John", "Doe", date, "j.doe@example.com", "JohnDoe", "hashedPassword1", Gender.MALE ),
+                new User(2L, "Eve", "McDonalds", date, "e.mcdonalds@example.com","EveMacd", "hashedPassword2", Gender.FEMALE),
+                new User(3L, "Donald", "Duck", date, "d.duck@example.com", "Donalds","hashedPassword3",  Gender.MALE)
         );
         List<UserEntity> allUserEntities = Arrays.asList(
-                UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build(),
-                UserEntity.builder().id(2L).firstName("Eve").lastName("McDonalds").birthDate(date).email("e.mcdonalds@example.com").hashedPassword("hashedPassword2").gender(Gender.FEMALE).build(),
-                UserEntity.builder().id(3L).firstName("Donald").lastName("Duck").birthDate(date).email("d.duck@example.com").hashedPassword("hashedPassword3").gender(Gender.MALE).build()
+                UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("JohnDoe").hashedPassword("hashedPassword1").gender(Gender.MALE).build(),
+                UserEntity.builder().id(2L).firstName("Eve").lastName("McDonalds").birthDate(date).email("e.mcdonalds@example.com").username("EveMacd").hashedPassword("hashedPassword2").gender(Gender.FEMALE).build(),
+                UserEntity.builder().id(3L).firstName("Donald").lastName("Duck").birthDate(date).email("d.duck@example.com").username("Donalds").hashedPassword("hashedPassword3").gender(Gender.MALE).build()
         );
         when(userRepository.findAll()).thenReturn(allUserEntities);
         // Act
@@ -74,9 +74,9 @@ class UserServiceTest {
     void getUser_shouldReturnUserConverted() {
         //Arrange
         LocalDate date = LocalDate.of(2014, 9, 16);
-        User expected = new User(1L, "John", "Doe", date, "j.doe@example.com", "hashedPassword1", Gender.MALE );
+        User expected = new User(1L, "John", "Doe", date, "j.doe@example.com", "JOhnDoe","hashedPassword1", Gender.MALE );
 
-        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("JOhnDoe").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         when(userRepository.findById(1L)).thenReturn(Optional.of(userEntity));
         Optional<User> expectedOptional = Optional.of(expected);
 
@@ -107,10 +107,11 @@ class UserServiceTest {
                 "Jonas",
                 date,
                 "nickJ@gmail.com",
+                "nickJonas",
                 "passNIck",
                 Gender.MALE
         );
-        UserEntity userEntity = UserEntity.builder().id(1L).firstName("Nick").lastName("JOnas").birthDate(date).email("nickJ@gmail.com").hashedPassword("hash").gender(Gender.MALE).build();
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("Nick").lastName("JOnas").birthDate(date).email("nickJ@gmail.com").username("nickJonas").hashedPassword("hash").gender(Gender.MALE).build();
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
         User actual = userService.createUser(userRequest);
@@ -127,6 +128,7 @@ class UserServiceTest {
                 "Jonas",
                 date,
                 "nickJ@gmail.com",
+                "nickJonas",
                 "123",
                 Gender.MALE
         );
@@ -136,6 +138,7 @@ class UserServiceTest {
                 .lastName(userRequest.getLastName())
                 .birthDate(userRequest.getBirthDate())
                 .email(userRequest.getEmail())
+                .username(userRequest.getUsername())
                 .hashedPassword(userRequest.getPassword())
                 .gender(userRequest.getGender())
                 .build();
@@ -201,7 +204,7 @@ class UserServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
 
         UpdateUserRequest updateUserRequest = new UpdateUserRequest(1L, "JOe", "Smith", LocalDate.of(1990, 5, 15), Gender.MALE);
-        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("johnDoe").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
 
         when(userRepository.findById(updateUserRequest.getId())).thenReturn(Optional.of(userEntity));
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);

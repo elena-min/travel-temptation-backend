@@ -1,9 +1,7 @@
 package org.individualproject.business.converter;
 
-import org.individualproject.domain.PaymentDetails;
 import org.individualproject.domain.Review;
 import org.individualproject.domain.User;
-import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.ReviewEntity;
 import org.individualproject.persistence.entity.UserEntity;
 

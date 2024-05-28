@@ -58,7 +58,7 @@ public class ReviewController {
     public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable(value = "userId") final Long userId)
     {
         Optional<User> userOptional = userService.getUser(userId);
-        if(userOptional == null){
+        if (userOptional.isEmpty()) {
             return  ResponseEntity.notFound().build();
         }
         User user = userOptional.get();
@@ -70,7 +70,7 @@ public class ReviewController {
     public ResponseEntity<List<Review>> getReviewsByTravelAgency(@PathVariable(value = "travelAgencyId") final Long travelAgencyId)
     {
         Optional<User> userOptional = userService.getUser(travelAgencyId);
-        if(userOptional == null){
+        if (!userOptional.isPresent()) {
             return  ResponseEntity.notFound().build();
         }
         User user = userOptional.get();

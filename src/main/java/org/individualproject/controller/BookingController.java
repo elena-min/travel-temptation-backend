@@ -4,6 +4,7 @@ package org.individualproject.controller;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.BookingService;
+import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
@@ -19,9 +20,11 @@ public class BookingController {
 
     private BookingService bookingService;
     private UserService userService;
-    public BookingController(BookingService bService, UserService uService){
+    private ExcursionService excursionService;
+    public BookingController(BookingService bService, UserService uService, ExcursionService eService){
         this.bookingService = bService;
         this.userService = uService;
+        this.excursionService = eService;
     }
 
     @GetMapping("/{id}")
@@ -67,11 +70,23 @@ public class BookingController {
     public ResponseEntity<List<Booking>> getBookingsByUser(@PathVariable(value = "userId") final Long userId)
     {
         Optional<User> userOptional = userService.getUser(userId);
-        if(userOptional == null){
+        if(userOptional.isEmpty()){
             return  ResponseEntity.notFound().build();
         }
         User user = userOptional.get();
         List<Booking> bookings = bookingService.getBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
+    }
+
+    @GetMapping("/excursion/{excursionId}")
+    public ResponseEntity<List<Booking>> getBookingsByExcursion(@PathVariable(value = "excursionId") final Long excursionId)
+    {
+        Optional<Excursion> excursionOptional = excursionService.getExcursion(excursionId);
+        if(excursionOptional.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+        Excursion excursion = excursionOptional.get();
+        List<Booking> bookings = bookingService.getBookingsByExcursion(excursion);
         return ResponseEntity.ok().body(bookings);
     }
 

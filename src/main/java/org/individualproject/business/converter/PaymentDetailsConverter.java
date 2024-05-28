@@ -5,9 +5,7 @@ import org.individualproject.domain.User;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PaymentDetailsConverter {
     public static PaymentDetails mapToDomain(PaymentDetailsEntity paymentDetailsEntity) {
