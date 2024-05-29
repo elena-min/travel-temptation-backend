@@ -1,6 +1,5 @@
 package org.individualproject.domain;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ public class UpdateBookingRequest {
 
     @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
     private LocalDateTime bookingTime;
 
     @NotNull

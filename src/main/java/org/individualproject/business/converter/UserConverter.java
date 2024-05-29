@@ -14,6 +14,7 @@ public class UserConverter {
                 .lastName(userEntity.getLastName())
                 .birthDate(userEntity.getBirthDate())
                 .email(userEntity.getEmail())
+                .username(userEntity.getUsername())
                 .hashedPassword(userEntity.getHashedPassword())
                 .gender(userEntity.getGender())
                 .build();
@@ -31,6 +32,7 @@ public class UserConverter {
                 .lastName(user.getLastName())
                 .birthDate(user.getBirthDate())
                 .email(user.getEmail())
+                .username(user.getUsername())
                 .hashedPassword(user.getHashedPassword())
                 .gender(user.getGender())
                 .build();

@@ -132,4 +132,12 @@ public class BookingService {
         return bookingEntities.stream().map(BookingConverter::mapToDomain).collect(Collectors.toList());
     }
 
+    public List<Booking> getBookingsByExcursion(Excursion excursion) {
+        ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(excursion);
+        List<BookingEntity> bookingEntities = bookingRepository.findByExcursion(excursionEntity);
+        return bookingEntities.stream()
+                .map(BookingConverter::mapToDomain)
+                .toList();
+    }
+
 }

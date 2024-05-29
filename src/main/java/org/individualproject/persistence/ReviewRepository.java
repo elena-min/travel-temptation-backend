@@ -11,4 +11,7 @@ import java.util.List;
 public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
     List<ReviewEntity> findByUserWriter(UserEntity userWriter);
 
+    List<ReviewEntity> findByTravelAgency(UserEntity travelAgency);
+
+
 }

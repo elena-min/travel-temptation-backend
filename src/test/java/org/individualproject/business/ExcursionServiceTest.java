@@ -36,6 +36,7 @@ class ExcursionServiceTest {
     private ExcursionRepository excursionRepository;
     @Mock
     private AccessToken accessToken;
+
     //This object is going to be initialized using the Mock objects
     @InjectMocks
     private ExcursionService excursionService;
@@ -91,8 +92,8 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
-                .startDate(startDate) // replace with actual date
-                .endDate(endDate) // replace with actual date
+                .startDate(startDate)
+                .endDate(endDate)
                 .travelAgency(userEntity)
                 .price(1500.0)
                 .numberOfAvaliableSpaces(58)
@@ -138,8 +139,8 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
-                .startDate(startDate) // replace with actual date
-                .endDate(endDate) // replace with actual date
+                .startDate(startDate)
+                .endDate(endDate)
                 .travelAgency(userEntity)
                 .price(1500.0)
                 .numberOfAvaliableSpaces(58)
@@ -149,8 +150,8 @@ class ExcursionServiceTest {
         CreateExcursionRequest createRequest = CreateExcursionRequest.builder()
                 .name("Mountain Hike")
                 .destinations(Arrays.asList("Paris", "London"))
-                .startDate(startDate) // replace with actual date
-                .endDate(endDate) // replace with actual date
+                .startDate(startDate)
+                .endDate(endDate)
                 .travelAgency(user)
                 .price(1500.0)
                 .numberOfAvaliableSpaces(58)
@@ -181,7 +182,7 @@ class ExcursionServiceTest {
     private static Stream<Arguments> provideStringsForIsParams() {
         Date startDate = new Date();
         Date endDate = new Date();
-        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "hashedPassword1", Gender.MALE);
+        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
 
         return Stream.of(
                 Arguments.of(new CreateExcursionRequest(null, Arrays.asList("Paris", "London"), startDate, endDate, validUser, 100.0, 50)), // Invalid name
@@ -206,8 +207,8 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
-                .startDate(startDate) // replace with actual date
-                .endDate(endDate) // replace with actual date
+                .startDate(startDate)
+                .endDate(endDate)
                 .travelAgency(userEntity)
                 .price(1500.0)
                 .numberOfAvaliableSpaces(58)
@@ -310,8 +311,8 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name(name)
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
-                .startDate(startDate) // replace with actual date
-                .endDate(endDate) // replace with actual date
+                .startDate(startDate)
+                .endDate(endDate)
                 .travelAgency(userEntity)
                 .price(1500.0)
                 .numberOfAvaliableSpaces(58)
@@ -367,11 +368,9 @@ class ExcursionServiceTest {
         int spacesBooked = 5;
         when(excursionRepository.decrementSpacesLeft(id, spacesBooked)).thenReturn(0);
 
-        // Act & Assert
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> excursionService.bookSpaces(id, spacesBooked));
         assertEquals("Not enough spaces left for this excursion!", exception.getMessage());
 
-        // Verify
         verify(excursionRepository).decrementSpacesLeft(id, spacesBooked);
     }
 
@@ -382,10 +381,6 @@ class ExcursionServiceTest {
         Date endDate = new Date(2028, 9, 24);
         User travelAgency = User.builder().id(1L).firstName("Travel").lastName("Agency").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
 
-        //User travelAgency = new User(1L, "Travel Agency", "Agency", null, null, null, null);
-        when(accessToken.hasRole(UserRole.ADMIN.name())).thenReturn(false);
-        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
-        when(accessToken.getUserID()).thenReturn(travelAgency.getId());
 
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
         List<ExcursionEntity> excursionEntities = Arrays.asList(

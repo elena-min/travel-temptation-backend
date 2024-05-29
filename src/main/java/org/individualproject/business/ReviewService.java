@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.*;
 import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.NotFoundException;
-import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
-import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.entity.*;
 import org.individualproject.persistence.ReviewRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -62,7 +59,6 @@ public class ReviewService {
             Optional<ReviewEntity> reviewEntity = reviewRepository.findById(id);
             if(reviewEntity.isPresent()){
 
-                ReviewEntity review = reviewEntity.get();
                 reviewRepository.deleteById(id);
                return true;
 
@@ -77,14 +73,15 @@ public class ReviewService {
     }
 
     public List<Review> getReviewsByUser(User user) {
-        if (!accessToken.hasRole(UserRole.ADMIN.name())) {
-            if (accessToken.getUserID() != user.getId()) {
-                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
-            }
-        }
         UserEntity userEntity = UserConverter.convertToEntity(user);
         List<ReviewEntity> reviewEntities = reviewRepository.findByUserWriter(userEntity);
-        return reviewEntities.stream().map(ReviewConverter::mapToDomain).collect(Collectors.toList());
+        return reviewEntities.stream().map(ReviewConverter::mapToDomain).toList();
+    }
+
+    public List<Review> getReviewsByTravelAgency(User travelAgency) {
+        UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
+        List<ReviewEntity> reviewEntities = reviewRepository.findByTravelAgency(userEntity);
+        return reviewEntities.stream().map(ReviewConverter::mapToDomain).toList();
     }
 
 }

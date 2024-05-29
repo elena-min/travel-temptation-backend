@@ -1,5 +1,6 @@
 package org.individualproject.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.PaymentDetailsService;
 import org.individualproject.domain.*;
@@ -34,12 +35,14 @@ public class PaymentDetailsController {
     }
 
     @PostMapping()
+    @RolesAllowed({"USER"})
     public ResponseEntity<PaymentDetails> create(@RequestBody @Valid CreatePaymentDetailsRequest request) {
         PaymentDetails response = paymentDetailsService.createPaymentDetails(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
+    @RolesAllowed({"USER"})
     public ResponseEntity<Long> deletePaymentDetails(@PathVariable(value = "id") final Long id)
     {
         if (paymentDetailsService.deletePaymentDetails(id)) {
@@ -49,6 +52,7 @@ public class PaymentDetailsController {
     }
 
     @PutMapping("/{id}")
+    @RolesAllowed({"USER"})
     public ResponseEntity<Void> updatePaymentDetails(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdatePaymentDetailsRequest request){
 
         request.setId(id);

@@ -56,7 +56,7 @@ public class UserControllerIntegrationTests {
 //        request.setPassword("password");
 //        request.setGender(Gender.MALE);
 //
-//        User user = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "hashedPassword", Gender.MALE);
+//        User user = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com","johnDoe", "hashedPassword", Gender.MALE);
 //        when(userService.createUser(any(CreateUserRequest.class))).thenReturn(user);
 //
 //        mockMvc.perform(post("/users")
@@ -74,9 +74,9 @@ public class UserControllerIntegrationTests {
 //        LocalDate date = LocalDate.of(2014, 9, 16);
 //
 //        List<User> expected =  Arrays.asList(
-//                new User(1L, "John", "Doe", date, "j.doe@example.com", "hashedPassword1", Gender.MALE ),
-//                new User(2L, "Eve", "McDonalds", date, "e.mcdonalds@example.com", "hashedPassword2", Gender.FEMALE),
-//                new User(3L, "Donald", "Duck", date, "d.duck@example.com", "hashedPassword3",  Gender.MALE)
+//                new User(1L, "John", "Doe", date, "j.doe@example.com","johnDoe", "hashedPassword1", Gender.MALE ),
+//                new User(2L, "Eve", "McDonalds", date, "e.mcdonalds@example.com","eveMcdon" , "hashedPassword2", Gender.FEMALE),
+//                new User(3L, "Donald", "Duck", date, "d.duck@example.com", "DOnalds", "hashedPassword3",  Gender.MALE)
 //        );
 //        when(userService.getUsers()).thenReturn(expected);
 //
@@ -99,7 +99,7 @@ public class UserControllerIntegrationTests {
 //
 //    @Test
 //    void getUser_shouldReturn200WithUser_whenUserFound() throws Exception {
-//        User user = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "hashedPassword", Gender.MALE);
+//        User user = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "johnDoe","hashedPassword", Gender.MALE);
 //
 //        when(userService.getUser(1L)).thenReturn(Optional.of(user));
 //
@@ -137,7 +137,7 @@ public class UserControllerIntegrationTests {
 //
 //        verify(userService).deleteUser(userId);
 //    }
-
+//
 //    @Test
 //    @WithMockUser(username = "admin@fontys.nl", roles = {"ADMIN"})
 //    void updateUser_shouldReturn204() throws Exception {
@@ -159,13 +159,11 @@ public class UserControllerIntegrationTests {
 //        long userId = 1L;
 //        UpdateUserRequest request = new UpdateUserRequest(userId, "", "Doe", LocalDate.of(1990, 1, 1), Gender.MALE);
 //
-//        // Performing PUT request with invalid request
 //        mockMvc.perform(put("/users/{id}", userId)
 //                        .contentType(MediaType.APPLICATION_JSON)
 //                        .content(objectMapper.writeValueAsString(request)))
 //                .andExpect(status().isBadRequest());
 //
-//        // Verifying that the userService.updateUser method is not called with invalid request
 //        verify(userService, never()).updateUser(request);
 //    }
 

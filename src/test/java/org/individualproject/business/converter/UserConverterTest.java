@@ -27,6 +27,7 @@ class UserConverterTest {
                 .lastName("Jonas")
                 .birthDate(date)
                 .email("nickJonas@gmail.com")
+                .username("nickJonas")
                 .hashedPassword("asdfgh")
                 .gender(Gender.MALE)
                 .build();
@@ -39,6 +40,7 @@ class UserConverterTest {
         assertEquals(userEntity.getLastName(), user.getLastName());
         assertEquals(userEntity.getBirthDate(), user.getBirthDate());
         assertEquals(userEntity.getEmail(), user.getEmail());
+        assertEquals(userEntity.getUsername(), user.getUsername());
         assertEquals(userEntity.getHashedPassword(), user.getHashedPassword());
         assertEquals(userEntity.getGender(), user.getGender());
 
@@ -55,6 +57,7 @@ class UserConverterTest {
                 .lastName("Jonas")
                 .birthDate(date)
                 .email("nickJonas@gmail.com")
+                .username("nickJonas")
                 .hashedPassword("asdfgh")
                 .gender(Gender.MALE)
                 .build();
@@ -64,6 +67,7 @@ class UserConverterTest {
                 .lastName("Jonas")
                 .birthDate(date)
                 .email("JOeJonas@gmail.com")
+                .username("JoeJOnas")
                 .hashedPassword("zxcvbnm")
                 .gender(Gender.OTHER)
                 .build();
@@ -80,6 +84,7 @@ class UserConverterTest {
         assertEquals(userEntity1.getLastName(), user1.getLastName());
         assertEquals(userEntity1.getBirthDate(), user1.getBirthDate());
         assertEquals(userEntity1.getEmail(), user1.getEmail());
+        assertEquals(userEntity1.getUsername(), user1.getUsername());
         assertEquals(userEntity1.getHashedPassword(), user1.getHashedPassword());
         assertEquals(userEntity1.getGender(), user1.getGender());
 
@@ -88,6 +93,7 @@ class UserConverterTest {
         assertEquals(userEntity2.getLastName(), user2.getLastName());
         assertEquals(userEntity2.getBirthDate(), user2.getBirthDate());
         assertEquals(userEntity2.getEmail(), user2.getEmail());
+        assertEquals(userEntity2.getUsername(), user2.getUsername());
         assertEquals(userEntity2.getHashedPassword(), user2.getHashedPassword());
         assertEquals(userEntity2.getGender(), user2.getGender());
     }
@@ -102,6 +108,7 @@ class UserConverterTest {
                 .lastName("Jonas")
                 .birthDate(date)
                 .email("nickJonas@gmail.com")
+                .username("nickJonas")
                 .hashedPassword("asdfgh")
                 .gender(Gender.MALE)
                 .build();
@@ -114,6 +121,7 @@ class UserConverterTest {
         assertEquals(user.getLastName(), userEntity.getLastName());
         assertEquals(user.getBirthDate(), userEntity.getBirthDate());
         assertEquals(user.getEmail(), userEntity.getEmail());
+        assertEquals(user.getUsername(), userEntity.getUsername());
         assertEquals(user.getHashedPassword(), userEntity.getHashedPassword());
         assertEquals(user.getGender(), userEntity.getGender());
     }

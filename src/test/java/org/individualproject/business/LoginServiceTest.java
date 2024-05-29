@@ -52,7 +52,6 @@ class LoginServiceTest {
         assertNotNull(response.getAccessToken());
         assertEquals("encodedAccessToken", response.getAccessToken());
 
-        // Verify interactions
         verify(userRepository, times(1)).findByUsername(loginRequest.getUsername());
         verify(passwordEncoder, times(1)).matches(loginRequest.getPassword(), userEntity.getHashedPassword());
         verify(accessTokenEncoderDecoder, times(1)).encode(any(AccessToken.class));
@@ -68,8 +67,6 @@ class LoginServiceTest {
 
         assertThrows(InvalidCredentialsException.class, () -> loginService.login(loginRequest));
 
-
-        // Verify interactions
         verify(userRepository, times(1)).findByUsername(loginRequest.getUsername());
         verify(passwordEncoder, never()).matches(anyString(), anyString());
         verify(accessTokenEncoderDecoder, never()).encode(any(AccessToken.class));

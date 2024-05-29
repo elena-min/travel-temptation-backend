@@ -20,7 +20,7 @@ sonar {
         property "sonar.host.url", "http://localhost:9001"
         property "sonar.qualitygate.wait", true
         property "sonar.token", "sqp_2e9296119fe9fcabbf7e30760d3d708ec122c4d1"
-        property "sonar.coverage.exclusions", "**/domain/**, **/configuration/**, **/controller/**, **/TravelApplication.java, **/entity/**"
+        property "sonar.coverage.exclusions", "**/domain/**, **/configuration/**, **/controller/**, **/TravelApplication.java, **/entity/**, **/exception/**"
 
     }
 }

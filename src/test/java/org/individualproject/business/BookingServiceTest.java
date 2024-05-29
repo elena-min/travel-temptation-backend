@@ -154,9 +154,6 @@ class BookingServiceTest {
                 .numberOfTravelers(5)
                 .status(BookingStatus.PENDING)
                 .build();
-
-
-        // Mock the excursionRepository
         when(bookingRepository.save(any(BookingEntity.class))).thenReturn(bookingEntity);
 
         Booking expectedExcursion = BookingConverter.mapToDomain(bookingEntity);
@@ -181,7 +178,7 @@ class BookingServiceTest {
         Date endDate = new Date();
         LocalDate expDate = LocalDate.of(2027, 9, 16);
 
-        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "hashedPassword1", Gender.MALE);
+        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "johnDoe", "hashedPassword1", Gender.MALE);
         Excursion excursion = Excursion.builder().id(1L).name("Mountain Hike").destinations(Arrays.asList("Paris", "London")).startDate(startDate).endDate(endDate).travelAgency(validUser).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetails paymentDetails = PaymentDetails.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(validUser).build();
 
@@ -265,7 +262,7 @@ class BookingServiceTest {
                 .bookingTime(LocalDateTime.now())
                 .excursion(excursion)
                 .numberOfTravelers(7)
-                .status(BookingStatus.COMPLETED)
+                .status(BookingStatus.CONFIRMED)
                 .build();
 
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(bookingEntity));
@@ -302,7 +299,7 @@ class BookingServiceTest {
                 .bookingTime(LocalDateTime.now())
                 .excursion(excursion)
                 .numberOfTravelers(7)
-                .status(BookingStatus.COMPLETED)
+                .status(BookingStatus.CONFIRMED)
                 .build();
 
         when(bookingRepository.findById(1L)).thenReturn(Optional.empty());

@@ -34,6 +34,7 @@ public class UserService {
                 .lastName(request.getLastName())
                 .birthDate(request.getBirthDate())
                 .email(request.getEmail())
+                .username(request.getUsername())
                 .hashedPassword(request.getPassword())
                 .gender(request.getGender())
                 .build();
@@ -42,7 +43,7 @@ public class UserService {
         if (userEntity.getId() != null) {
             return UserConverter.mapToDomain(userEntity);
         } else {
-            return null; // Return null if the saved entity is null
+            return null;
         }
     }
 
@@ -72,7 +73,7 @@ public class UserService {
             if(existingUser.getBirthDate()!= null){
                 existingUser.setBirthDate(request.getBirthDate());
             }
-            userRepository.save(existingUser); // This should not trigger password validation
+            userRepository.save(existingUser);
             return true;
         } else {
             return false;

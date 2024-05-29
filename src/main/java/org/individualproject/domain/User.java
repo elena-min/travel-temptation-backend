@@ -16,6 +16,7 @@ public class User {
     private String lastName;
     private LocalDate birthDate;
     private String email;
+    private String username;
     private String hashedPassword;
     private Gender gender;
 
@@ -27,6 +28,7 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
                 ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
                 ", hashedPassword='" + hashedPassword + '\'' +
                 ", gender=" + gender +
                 '}';

@@ -1,5 +1,6 @@
 package org.individualproject.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
@@ -41,15 +42,15 @@ public class ExcursionsController {
         return ResponseEntity.ok().body(excursions);
     }
 
-    //@RolesAllowed({"TRAVELINGAGENCY", "ADMIN"})
     @PostMapping()
+    @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
     public ResponseEntity<Excursion> createExcursion(@RequestBody @Valid CreateExcursionRequest request) {
         Excursion response = excursionService.createExcursion(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    //@RolesAllowed({"TRAVElAGENCY", "ADMIN"})
     @DeleteMapping("/{id}")
+    @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
     public ResponseEntity<Long> deleteExcursion(@PathVariable(value = "id") final Long id)
     {
         if (excursionService.deleteExcursion(id)) {
@@ -58,8 +59,8 @@ public class ExcursionsController {
         return ResponseEntity.notFound().build();
     }
 
-   // @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
     @PutMapping("/{id}")
+    @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
     public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateExcursionRequest request){
 
         request.setId(id);
