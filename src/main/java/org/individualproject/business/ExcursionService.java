@@ -18,6 +18,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,68 +96,6 @@ public class ExcursionService {
         return excursionEntity.map(ExcursionConverter::mapToDomain);
     }
 
-    public List<Excursion> findExcursionsByName(String name){
-        List<ExcursionEntity> excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
-        return ExcursionConverter.mapToDomainList(excursionEntities);
-    }
-
-    public List<Excursion> findExcursionsByPriceRange(String priceRange){
-        List<ExcursionEntity> excursionEntities;
-        if (priceRange.startsWith("<") || priceRange.startsWith(">")) {
-            double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" or "<" symbol
-            if (priceRange.startsWith(">")) {
-                excursionEntities = excursionRepository.findByPriceGreaterThan(price);
-            } else {
-                excursionEntities = excursionRepository.findByPriceLessThan(price);
-            }
-        } else {
-            String[] prices = priceRange.split("-");
-            double minPrice = Double.parseDouble(prices[0]);
-            double maxPrice = Double.parseDouble(prices[1]);
-            excursionEntities = excursionRepository.findByPriceRange(minPrice, maxPrice);
-        }
-        return ExcursionConverter.mapToDomainList(excursionEntities);
-    }
-
-    public List<Excursion> searchExcursionsByNameAndPriceRange(String name, String priceRange) {
-        List<ExcursionEntity> excursionEntities = new ArrayList<>();
-        if (name != null && !name.isEmpty()) {
-            // Search by both name and price range
-            if (priceRange != null && !priceRange.isEmpty()) {
-                if (priceRange.startsWith(">") || priceRange.endsWith(">")) {
-                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" symbol
-                    excursionEntities = excursionRepository.findByNameContainingIgnoreCaseAndPriceGreaterThan(name, price);
-                } else if (priceRange.startsWith("<") || priceRange.endsWith("<")) {
-                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the "<" symbol
-                    excursionEntities = excursionRepository.findByNameContainingIgnoreCaseAndPriceLessThan(name, price);
-                } else {
-                    String[] prices = priceRange.split("-");
-                    double minPrice = Double.parseDouble(prices[0]);
-                    double maxPrice = Double.parseDouble(prices[1]);
-                    excursionEntities = excursionRepository.findByNameContainingIgnoreCaseAndPriceRange(name, minPrice, maxPrice);
-                }
-            } else {
-                excursionEntities = excursionRepository.findByNameContainingIgnoreCase(name);
-            }
-        } else {
-            // Search only by price range
-            if (priceRange != null && !priceRange.isEmpty()) {
-                if (priceRange.startsWith(">") || priceRange.endsWith(">")) {
-                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the ">" symbol
-                    excursionEntities = excursionRepository.findByPriceGreaterThan(price);
-                } else if (priceRange.startsWith("<") || priceRange.endsWith("<")) {
-                    double price = Double.parseDouble(priceRange.substring(1)); // Remove the "<" symbol
-                    excursionEntities = excursionRepository.findByPriceLessThan(price);
-                } else {
-                    String[] prices = priceRange.split("-");
-                    double minPrice = Double.parseDouble(prices[0]);
-                    double maxPrice = Double.parseDouble(prices[1]);
-                    excursionEntities = excursionRepository.findByPriceRange(minPrice, maxPrice);
-                }
-            }
-        }
-        return ExcursionConverter.mapToDomainList(excursionEntities);
-    }
 
     public void bookSpaces(Long id, int spacesBooked){
         int updatedRows = excursionRepository.decrementSpacesLeft(id, spacesBooked);
@@ -172,5 +111,40 @@ public class ExcursionService {
         return ExcursionConverter.mapToDomainList(excursionEntities);
     }
 
+    public List<Excursion> searchExcursionsByNameAndTravelAgency(String searchTerm) {
+        List<ExcursionEntity> excursionEntities = excursionRepository.findByNameContainingIgnoreCaseOrTravelAgency_FirstNameContainingIgnoreCaseOrTravelAgency_LastNameContainingIgnoreCase(searchTerm, searchTerm, searchTerm);
+        return ExcursionConverter.mapToDomainList(excursionEntities);
+    }
 
+    public List<Excursion> searchExcursions(String searchTerm, double minPrice, double maxPrice) {
+        if ((searchTerm == null || searchTerm.isEmpty()) && (minPrice == 0 && maxPrice == Double.MAX_VALUE)) {
+            return ExcursionConverter.mapToDomainList(excursionRepository.findAll());
+        }
+
+        if (searchTerm == null) {
+            searchTerm = "";
+        }
+
+        if (searchTerm.isEmpty() && (minPrice > 0 || maxPrice < Double.MAX_VALUE)) {
+            return ExcursionConverter.mapToDomainList(
+                    excursionRepository.findByPriceBetween(minPrice, maxPrice)
+            );
+        } else if (searchTerm.isEmpty()) {
+            return ExcursionConverter.mapToDomainList(excursionRepository.findAll());
+        } else if (minPrice == 0 && maxPrice == Double.MAX_VALUE) {
+            return ExcursionConverter.mapToDomainList(
+                    excursionRepository.findByNameContainingIgnoreCaseOrTravelAgency_FirstNameContainingIgnoreCaseOrTravelAgency_LastNameContainingIgnoreCase(
+                            searchTerm, searchTerm, searchTerm
+                    )
+            );
+        } else {
+            return ExcursionConverter.mapToDomainList(
+                    excursionRepository.findByNameContainingIgnoreCaseAndPriceBetweenOrTravelAgency_FirstNameContainingIgnoreCaseAndPriceBetweenOrTravelAgency_LastNameContainingIgnoreCaseAndPriceBetween(
+                            searchTerm, minPrice, maxPrice,
+                            searchTerm, minPrice, maxPrice,
+                            searchTerm, minPrice, maxPrice
+                    )
+            );
+        }
+    }
 }

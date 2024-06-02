@@ -10,6 +10,7 @@ import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
+import org.individualproject.domain.enums.BookingStatus;
 import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
@@ -20,6 +21,7 @@ import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -139,5 +141,22 @@ public class BookingService {
                 .map(BookingConverter::mapToDomain)
                 .toList();
     }
+
+    public Double getTotalSalesInLastQuarter(LocalDateTime startDate, LocalDateTime endDate, BookingStatus status){
+        return bookingRepository.getTotalSalesInLastQuarter(startDate, endDate, status);
+    }
+
+    public Double getTotalSalesInLastQuarterForExcursion(Long excursionID,LocalDateTime startDate, LocalDateTime endDate, BookingStatus status){
+        return bookingRepository.getTotalSalesInLastQuarterForExcursion(excursionID, startDate, endDate, status);
+    }
+
+    public List<WeeklyStatisticsDTO> getWeeklyStatistics(Long excursionID, BookingStatus status){
+        return bookingRepository.getWeeklyStatistics(excursionID, status);
+    }
+
+    public List<BookingDataDTO> getBookingDataByDateRangePerExcursion(Long excursionID, LocalDateTime startDate, LocalDateTime endDate){
+        return bookingRepository.getBookingDataByDateRange(excursionID, startDate,endDate);
+    }
+
 
 }

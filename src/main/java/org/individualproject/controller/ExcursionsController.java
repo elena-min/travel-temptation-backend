@@ -77,30 +77,6 @@ public class ExcursionsController {
 
     }
 
-//    @GetMapping("/search")
-//    public ResponseEntity<List<Excursion>> searchExcursionByName(final String name){
-//        List<Excursion> excursions = excursionService.findExcursionsByName(name);
-//        return ResponseEntity.ok().body(excursions);
-//    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<Excursion>> searchExcursionByNameAndPrice(@RequestParam(value= "name", required = false) String name, @RequestParam(value= "priceRange", required = false) String priceRange ){
-        List<Excursion> excursions;
-        if(name != null && priceRange != null){
-            excursions = excursionService.searchExcursionsByNameAndPriceRange(name, priceRange);
-        }
-        else if(name != null){
-            excursions = excursionService.findExcursionsByName(name);
-
-        }
-        else if(priceRange != null){
-            excursions = excursionService.findExcursionsByPriceRange(priceRange);
-        }
-        else{
-            return ResponseEntity.badRequest().build();
-        }
-        return ResponseEntity.ok().body(excursions);
-    }
 
     @GetMapping("/travelAgency/{travelAgencyID}")
     public ResponseEntity<List<Excursion>> getExcursionsByTravelAgency(@PathVariable(value = "travelAgencyID") Long travelAgency)
@@ -111,6 +87,39 @@ public class ExcursionsController {
         }
         User user = userOptional.get();
         List<Excursion> excursions = excursionService.getExcursionsByTravelAgency(user);
+        return ResponseEntity.ok().body(excursions);
+    }
+
+    @GetMapping("/searchName")
+    public ResponseEntity<List<Excursion>> searchExcursionsByNameAndTravelAgency(@RequestParam(value = "searchTerm", required = false) String searchTerm) {
+        List<Excursion> excursions;
+        if (searchTerm != null && !searchTerm.isEmpty()) {
+            excursions = excursionService.searchExcursionsByNameAndTravelAgency(searchTerm);
+        } else {
+            excursions = excursionService.getExcursions();
+        }
+         return ResponseEntity.ok().body(excursions);
+    }
+
+    @GetMapping("/searchNameAndPrice")
+    public ResponseEntity<List<Excursion>> searchExcursions(
+            @RequestParam(value = "searchTerm", required = false) String searchTerm,
+            @RequestParam(value = "minPrice", required = false) String minPrice,
+            @RequestParam(value = "maxPrice", required = false) String maxPrice) {
+        Double minPriceValue = 0.0;
+        Double maxPriceValue = Double.MAX_VALUE;
+
+
+            if (minPrice != null) {
+                minPriceValue = Double.parseDouble(minPrice);
+            }
+            if (maxPrice != null && !maxPrice.equals("Infinity")) {
+                maxPriceValue = Double.parseDouble(maxPrice);
+            }
+
+        List<Excursion> excursions = excursionService.searchExcursions(
+                searchTerm, minPriceValue, maxPriceValue);
+
         return ResponseEntity.ok().body(excursions);
     }
 }

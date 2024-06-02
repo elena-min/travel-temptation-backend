@@ -7,10 +7,13 @@ import org.individualproject.business.BookingService;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.*;
+import org.individualproject.domain.enums.BookingStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,6 +91,39 @@ public class BookingController {
         Excursion excursion = excursionOptional.get();
         List<Booking> bookings = bookingService.getBookingsByExcursion(excursion);
         return ResponseEntity.ok().body(bookings);
+    }
+
+    @GetMapping("/total-sales-last-quarter")
+    public ResponseEntity<Double> getTotalSalesLastQuarter(@RequestParam(value = "startDate") LocalDateTime startDate,
+                                                            @RequestParam(value = "endDate") LocalDateTime endDate,
+                                                            @RequestParam(value = "status") BookingStatus status)
+    {
+        Double totalSales = bookingService.getTotalSalesInLastQuarter(startDate, endDate, status);
+        return ResponseEntity.ok().body(totalSales);
+    }
+
+    @GetMapping("/total-sales-last-quarter/{excursionId}")
+    public ResponseEntity<Double> getTotalSalesLastQuarterPerExcursion(
+                                                              @PathVariable Long excursionId,
+                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                                              @RequestParam(value = "status") BookingStatus status){
+        Double totalSales = bookingService.getTotalSalesInLastQuarterForExcursion(excursionId, startDate, endDate, status);
+        return ResponseEntity.ok().body(totalSales);
+    }
+
+    @GetMapping("/weekly-statistics/{excursionId}")
+    public ResponseEntity<List<WeeklyStatisticsDTO>> getWeeklyStatistics(@PathVariable Long excursionId, @RequestParam(value = "status") BookingStatus status){
+        List<WeeklyStatisticsDTO> weeklyStatistics = bookingService.getWeeklyStatistics(excursionId, status);
+        return ResponseEntity.ok().body(weeklyStatistics);
+    }
+
+    @GetMapping("/booking-statistics/{excursionId}")
+    public ResponseEntity<List<BookingDataDTO>> getBookingDataByDateRangePerExcursion(@PathVariable Long excursionId,
+                                                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){
+        List<BookingDataDTO> bookingDataDTOS = bookingService.getBookingDataByDateRangePerExcursion(excursionId, startDate, endDate);
+        return ResponseEntity.ok().body(bookingDataDTOS);
     }
 
 }
