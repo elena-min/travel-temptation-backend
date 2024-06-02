@@ -28,7 +28,7 @@ public class ExcursionConverter {
     public static List<Excursion> mapToDomainList(List<ExcursionEntity> excursionEntities) {
         return excursionEntities.stream()
                 .map(ExcursionConverter::mapToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static ExcursionEntity convertToEntity(Excursion excursion){

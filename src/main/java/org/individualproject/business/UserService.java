@@ -1,7 +1,10 @@
 package org.individualproject.business;
 
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
+import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
+import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.UserRepository;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import java.util.Optional;
 public class UserService {
 
     private UserRepository userRepository;
+    private AccessToken requestAccessToken;
     @Autowired
     public UserService(UserRepository uRepository){
         this.userRepository = uRepository;
@@ -57,6 +61,10 @@ public class UserService {
     }
 
     public boolean updateUser(UpdateUserRequest request) {
+        if (requestAccessToken.getUserID() != request.getId()) {
+            throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
+        }
+
         Optional<UserEntity> optionalUser = userRepository.findById(request.getId());
         if (optionalUser.isPresent()) {
             UserEntity existingUser = optionalUser.get();
@@ -79,6 +87,5 @@ public class UserService {
             return false;
         }
     }
-
 
 }

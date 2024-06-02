@@ -1,6 +1,7 @@
 package org.individualproject.controller;
 
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.*;
@@ -41,6 +42,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @RolesAllowed({"USER"})
     public ResponseEntity<Long> deleteUser(@PathVariable(value = "id") final Long id)
     {
         if (userService.deleteUser(id)) {
@@ -50,6 +52,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @RolesAllowed({"USER"})
     public ResponseEntity<Void> updateUser(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateUserRequest request){
 
         request.setId(id);

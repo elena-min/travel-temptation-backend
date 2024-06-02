@@ -3,7 +3,6 @@ package org.individualproject.business.converter;
 import org.individualproject.domain.User;
 import org.individualproject.persistence.entity.UserEntity;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class UserConverter {
 
@@ -22,7 +21,7 @@ public class UserConverter {
     public static List<User> mapToDomainList(List<UserEntity> userEntities) {
         return userEntities.stream()
                 .map(UserConverter::mapToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static UserEntity convertToEntity(User user){

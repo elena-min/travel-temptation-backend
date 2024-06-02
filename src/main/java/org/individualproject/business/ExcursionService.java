@@ -17,8 +17,6 @@ import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +24,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ExcursionService {
     private ExcursionRepository excursionRepository;
-    private AccessToken accessToken;
+    private AccessToken requestAccessToken;
     public List<Excursion> getExcursions() {
         List<ExcursionEntity> excursionEntities = excursionRepository.findAll();
         return ExcursionConverter.mapToDomainList(excursionEntities);
@@ -43,7 +41,7 @@ public class ExcursionService {
             throw new InvalidExcursionDataException("Invalid input data");
         }
 
-        if (!accessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+        if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
             throw new UnauthorizedDataAccessException("Only travel agencies can list excursions!");
         }
 
@@ -64,18 +62,39 @@ public class ExcursionService {
     }
 
     public boolean deleteExcursion(Long id) {
-        try {
+        Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(id);
+
+        if (optionalExcursion.isPresent()) {
+            ExcursionEntity excursion = optionalExcursion.get();
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+                throw new UnauthorizedDataAccessException("ONLY_TRAVEL_AGENCIES_ALLOWED");
+            }
+
+            if (!requestAccessToken.getUserID().equals(excursion.getTravelAgency().getId())) {
+                throw new UnauthorizedDataAccessException("EXCURSION_NOT_OWNED_BY_LOGGED_IN_USER");
+            }
+
             excursionRepository.deleteById(id);
             return true;
-        } catch (EmptyResultDataAccessException e) {
+        } else {
             return false;
         }
     }
 
     public boolean updateExcursion(UpdateExcursionRequest request) {
         Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(request.getId());
+
         if (optionalExcursion.isPresent()) {
             ExcursionEntity existingExcursion = optionalExcursion.get();
+
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+                throw new UnauthorizedDataAccessException("ONLY_TRAVEL_AGENCIES_ALLOWED");
+            }
+
+            if (!requestAccessToken.getUserID().equals(existingExcursion.getTravelAgency().getId())) {
+                throw new UnauthorizedDataAccessException("EXCURSION_NOT_OWNED_BY_LOGGED_IN_USER");
+            }
+
             existingExcursion.setName(request.getName());
             List<String> destinations = request.getDestinations();
             String destinationsString = String.join(",", destinations);
@@ -105,7 +124,6 @@ public class ExcursionService {
     }
 
     public List<Excursion> getExcursionsByTravelAgency(User travelAgency) {
-
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
         List<ExcursionEntity> excursionEntities = excursionRepository.findByTravelAgency(userEntity);
         return ExcursionConverter.mapToDomainList(excursionEntities);

@@ -22,27 +22,37 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class BookingService {
     private BookingRepository bookingRepository;
     private ExcursionRepository excursionRepository;
-    private AccessToken accessToken;
+    private AccessToken requestAccessToken;
 
     public List<Booking> getBookings() {
+
         List<BookingEntity> bookingEntities = bookingRepository.findAll();
         return BookingConverter.mapToDomainList(bookingEntities);
     }
 
     public Optional<Booking> getBooking(Long id) {
-        Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
-        return bookingEntity.map(BookingConverter::mapToDomain);
+
+        Optional<BookingEntity> bookingEntityOptional = bookingRepository.findById(id);
+        if (bookingEntityOptional.isPresent()) {
+            BookingEntity bookingEntity = bookingEntityOptional.get();
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+                if (!requestAccessToken.getUserID().equals(bookingEntity.getUser().getId())) {
+                    throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
+                }
+            }
+            return Optional.of(BookingConverter.mapToDomain(bookingEntity));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public Booking createBooking(CreateBookingRequest createBookingRequest) {
@@ -83,6 +93,12 @@ public class BookingService {
             if(bookingEntity.isPresent()){
 
                 BookingEntity booking = bookingEntity.get();
+
+                if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+                    if (!requestAccessToken.getUserID().equals(booking.getUser().getId())) {
+                        throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
+                    }
+                }
                 Date currentDate = new Date();
                 Date tripStartDate = booking.getExcursion().getStartDate();
                 long twoWeeksInMillis = 14 * 24 * 60 * 60 * 1000;
@@ -111,6 +127,12 @@ public class BookingService {
         Optional<BookingEntity> optionalBooking = bookingRepository.findById(updateBookingRequest.getId());
         if (optionalBooking.isPresent()) {
             BookingEntity existingBooking = optionalBooking.get();
+
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+                if (!requestAccessToken.getUserID().equals(existingBooking.getUser().getId())) {
+                    throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
+                }
+            }
             existingBooking.setExcursion(excursionEntity);
             existingBooking.setBookingTime(updateBookingRequest.getBookingTime());
             existingBooking.setStatus(updateBookingRequest.getStatus());
@@ -124,14 +146,14 @@ public class BookingService {
     }
 
     public List<Booking> getBookingsByUser(User user) {
-        if (!accessToken.hasRole(UserRole.ADMIN.name())) {
-            if (accessToken.getUserID() != user.getId()) {
+        if (!requestAccessToken.hasRole(UserRole.ADMIN.name())) {
+            if (!requestAccessToken.getUserID().equals(user.getId())) {
                 throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
             }
         }
         UserEntity userEntity = UserConverter.convertToEntity(user);
         List<BookingEntity> bookingEntities = bookingRepository.findByUser(userEntity);
-        return bookingEntities.stream().map(BookingConverter::mapToDomain).collect(Collectors.toList());
+        return bookingEntities.stream().map(BookingConverter::mapToDomain).toList();
     }
 
     public List<Booking> getBookingsByExcursion(Excursion excursion) {

@@ -21,6 +21,7 @@ public class PaymentDetailsController {
     }
 
     @GetMapping("/{id}")
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<PaymentDetails> getPaymentDetails(@PathVariable(value = "id") final Long id)
     {
         final Optional<PaymentDetails> paymentDetailsOptional = paymentDetailsService.getPaymentDetails(id);
@@ -28,6 +29,7 @@ public class PaymentDetailsController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping()
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<PaymentDetails>> getAllPaymentDetails()
     {
         List<PaymentDetails> paymentDetails = paymentDetailsService.getAllPaymentDetails();
@@ -42,7 +44,7 @@ public class PaymentDetailsController {
     }
 
     @DeleteMapping("/{id}")
-    @RolesAllowed({"USER"})
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Long> deletePaymentDetails(@PathVariable(value = "id") final Long id)
     {
         if (paymentDetailsService.deletePaymentDetails(id)) {
@@ -52,7 +54,7 @@ public class PaymentDetailsController {
     }
 
     @PutMapping("/{id}")
-    @RolesAllowed({"USER"})
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Void> updatePaymentDetails(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdatePaymentDetailsRequest request){
 
         request.setId(id);

@@ -31,6 +31,7 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Booking> getBooking(@PathVariable(value = "id") final Long id)
     {
         final Optional<Booking> bookingOptional = bookingService.getBooking(id);
@@ -38,6 +39,7 @@ public class BookingController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping()
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<Booking>> getBookings()
     {
         List<Booking> bookings = bookingService.getBookings();
@@ -62,6 +64,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}")
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Void> updateBooking(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateBookingRequest request){
 
         request.setId(id);
@@ -70,6 +73,7 @@ public class BookingController {
     }
 
     @GetMapping("/user/{userId}")
+    @RolesAllowed({"USER"})
     public ResponseEntity<List<Booking>> getBookingsByUser(@PathVariable(value = "userId") final Long userId)
     {
         Optional<User> userOptional = userService.getUser(userId);
@@ -82,6 +86,7 @@ public class BookingController {
     }
 
     @GetMapping("/excursion/{excursionId}")
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<Booking>> getBookingsByExcursion(@PathVariable(value = "excursionId") final Long excursionId)
     {
         Optional<Excursion> excursionOptional = excursionService.getExcursion(excursionId);
@@ -94,6 +99,7 @@ public class BookingController {
     }
 
     @GetMapping("/total-sales-last-quarter")
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<Double> getTotalSalesLastQuarter(@RequestParam(value = "startDate") LocalDateTime startDate,
                                                             @RequestParam(value = "endDate") LocalDateTime endDate,
                                                             @RequestParam(value = "status") BookingStatus status)
@@ -103,6 +109,7 @@ public class BookingController {
     }
 
     @GetMapping("/total-sales-last-quarter/{excursionId}")
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<Double> getTotalSalesLastQuarterPerExcursion(
                                                               @PathVariable Long excursionId,
                                                               @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
@@ -113,12 +120,14 @@ public class BookingController {
     }
 
     @GetMapping("/weekly-statistics/{excursionId}")
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<WeeklyStatisticsDTO>> getWeeklyStatistics(@PathVariable Long excursionId, @RequestParam(value = "status") BookingStatus status){
         List<WeeklyStatisticsDTO> weeklyStatistics = bookingService.getWeeklyStatistics(excursionId, status);
         return ResponseEntity.ok().body(weeklyStatistics);
     }
 
     @GetMapping("/booking-statistics/{excursionId}")
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<BookingDataDTO>> getBookingDataByDateRangePerExcursion(@PathVariable Long excursionId,
                                                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){

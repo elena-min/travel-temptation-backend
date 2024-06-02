@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.*;
 import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.NotFoundException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
+import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.entity.*;
 import org.individualproject.persistence.ReviewRepository;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -55,21 +57,24 @@ public class ReviewService {
     }
 
     public boolean deleteReview(Long id) {
-        try {
-            Optional<ReviewEntity> reviewEntity = reviewRepository.findById(id);
-            if(reviewEntity.isPresent()){
 
-                reviewRepository.deleteById(id);
-               return true;
+        Optional<ReviewEntity> reviewEntityOptional = reviewRepository.findById(id);
+        if(reviewEntityOptional.isPresent()){
 
+            ReviewEntity reviewEntity = reviewEntityOptional.get();
 
-            }else{
-                throw new NotFoundException("Review not found.");
+            if (!accessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
+                if (!accessToken.getUserID().equals(reviewEntity.getUserWriter().getId())) {
+                    throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
+                }
             }
+            reviewRepository.deleteById(id);
+            return true;
 
-        } catch (EmptyResultDataAccessException e) {
+        }else{
             return false;
         }
+
     }
 
     public List<Review> getReviewsByUser(User user) {
