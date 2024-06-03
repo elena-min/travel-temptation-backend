@@ -32,6 +32,11 @@ public class UserService {
         return userEntity.map(UserConverter::mapToDomain);
     }
 
+    public User getUserByUsername(String username) {
+        UserEntity userEntity = userRepository.findByUsername(username);
+        return UserConverter.mapToDomain(userEntity);
+    }
+
     public User createUser(CreateUserRequest request){
         UserEntity newUser = UserEntity.builder()
                 .firstName(request.getFirstName())
