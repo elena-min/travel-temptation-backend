@@ -13,9 +13,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     //This method is responsible for routing messages from one client to another
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue"); // This is the prefix for topics for subscribers
-       // config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/topic", "/user"); // This is the prefix for topics for subscribers
         config.setUserDestinationPrefix("/user");
+        config.setApplicationDestinationPrefixes("/app");
     }
 
 

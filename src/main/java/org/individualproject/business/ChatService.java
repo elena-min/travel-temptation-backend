@@ -13,7 +13,9 @@ import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -39,11 +41,28 @@ public class ChatService {
         notificationsRepository.save(notificationMessageEntity);
     }
 
-//    public List<NotificationMessage> getMessagesBetweenUsers(Long userIdReceiver){
-//        Long loggedinUserId = accessToken.getUserID();
-//        return notificationsRepository.getMessagesBetweenUsers(loggedinUserId, userIdReceiver)
-//                .stream()
-//                .map(NotificationMessageConverter::mapToDomain)
-//                .toList();
-//    }
+
+
+    public List<NotificationMessage> getChatsForUser(Long userIdReceiver){
+        Long loggedinUserId = accessToken.getUserID();
+        return notificationsRepository.findAllUniqueChatsForUser(loggedinUserId)
+                .stream()
+                .map(NotificationMessageConverter::mapToDomain)
+                .toList();
+    }
+
+    public List<NotificationMessage> getChatMessages(Long userIdReceiver, Long userIdSender){
+        List<NotificationMessageEntity> messages1 = notificationsRepository.findByToUserAndFromUser(UserEntity.builder().id(userIdReceiver).build(), UserEntity.builder().id(userIdSender).build());
+        List<NotificationMessageEntity> messages2 = notificationsRepository.findByToUserAndFromUser(UserEntity.builder().id(userIdSender).build(), UserEntity.builder().id(userIdReceiver).build());
+
+        List<NotificationMessage> allMessages = Stream.concat(
+                        messages1.stream(), messages2.stream())
+                .map(NotificationMessageConverter::mapToDomain)
+                .sorted(Comparator.comparing(NotificationMessage::getTimestamp))
+                .toList();
+
+
+        return allMessages;
+
+    }
 }

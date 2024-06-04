@@ -17,6 +17,7 @@ public class NotificationMessageConverter {
                 .to(toUser.getUsername())
                 .isRead(notificationMessageEntity.isRead())
                 .message(notificationMessageEntity.getMessage())
+                .timestamp(notificationMessageEntity.getTimestamp())
                 .build();
     }
 }

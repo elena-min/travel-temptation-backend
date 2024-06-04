@@ -23,7 +23,7 @@ public class ChatController {
     private final ChatService chatService;
     private final UserService userService;
 
-    @MessageMapping("/chat.sendMessage")
+    @MessageMapping("/chat.send")
     public ResponseEntity<Void> sendMessage(@Payload NotificationMessage message) {
         chatService.saveNotification(message);
         messagingTemplate.convertAndSendToUser(message.getTo(), "/queue/messages", message);
@@ -32,10 +32,19 @@ public class ChatController {
     }
 
 
-//    @GetMapping("/messages/{userId}")
-//    public ResponseEntity<List<NotificationMessage>> getMessages(@PathVariable Long  userIdReceiver) {
-//        List<NotificationMessage> messages = chatService.getMessagesBetweenUsers(userIdReceiver);
-//        return ResponseEntity.ok().body(messages);
-//    }
+    @GetMapping("/chats/{userId}")
+    public ResponseEntity<List<NotificationMessage>> getChatsForUser(@PathVariable(value = "userId") Long  userId) {
+        List<NotificationMessage> messages = chatService.getChatsForUser(userId);
+        return ResponseEntity.ok().body(messages);
+    }
+
+    @GetMapping("/chat/{fromUserId}/{toUserId}/messages")
+    public ResponseEntity<List<NotificationMessage>> getChatMessages(
+            @PathVariable Long fromUserId,
+            @PathVariable Long toUserId) {
+
+        List<NotificationMessage> messages = chatService.getChatMessages(toUserId, fromUserId);
+        return ResponseEntity.ok(messages);
+    }
 
 }
