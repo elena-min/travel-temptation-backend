@@ -14,7 +14,6 @@ import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

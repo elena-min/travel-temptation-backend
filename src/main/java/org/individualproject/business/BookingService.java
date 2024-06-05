@@ -22,6 +22,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -156,6 +157,30 @@ public class BookingService {
         return bookingEntities.stream().map(BookingConverter::mapToDomain).toList();
     }
 
+    public List<Booking> getPastBookingsByUser(User user) {
+        if (!requestAccessToken.hasRole(UserRole.ADMIN.name())) {
+            if (!requestAccessToken.getUserID().equals(user.getId())) {
+                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
+            }
+        }
+        UserEntity userEntity = UserConverter.convertToEntity(user);
+        LocalDateTime currentDate = LocalDateTime.now();
+        Date currentDateAsDate = Date.from(currentDate.atZone(ZoneId.systemDefault()).toInstant());
+        List<BookingEntity> bookingEntities = bookingRepository.findByUserAndExcursion_StartDateAfter(userEntity, currentDateAsDate);
+        return bookingEntities.stream().map(BookingConverter::mapToDomain).toList();
+    }
+    public List<Booking> getFutureBookingsByUser(User user) {
+        if (!requestAccessToken.hasRole(UserRole.ADMIN.name())) {
+            if (!requestAccessToken.getUserID().equals(user.getId())) {
+                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
+            }
+        }
+        UserEntity userEntity = UserConverter.convertToEntity(user);
+        LocalDateTime currentDate = LocalDateTime.now();
+        Date currentDateAsDate = Date.from(currentDate.atZone(ZoneId.systemDefault()).toInstant());
+        List<BookingEntity> bookingEntities = bookingRepository.findByUserAndExcursion_StartDateBeforeOrExcursion_StartDateEquals(userEntity, currentDateAsDate);
+        return bookingEntities.stream().map(BookingConverter::mapToDomain).toList();
+    }
     public List<Booking> getBookingsByExcursion(Excursion excursion) {
         ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(excursion);
         List<BookingEntity> bookingEntities = bookingRepository.findByExcursion(excursionEntity);

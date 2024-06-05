@@ -1,5 +1,7 @@
 package org.individualproject.controller;
 
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.individualproject.business.ChatService;
 import org.individualproject.business.UserService;
@@ -33,15 +35,17 @@ public class ChatController {
 
 
     @GetMapping("/chats/{userId}")
-    public ResponseEntity<List<NotificationMessage>> getChatsForUser(@PathVariable(value = "userId") Long  userId) {
+    @RolesAllowed({"TRAVELAGENCY"})
+    public ResponseEntity<List<NotificationMessage>> getChatsForUser(@PathVariable(value = "userId")@NotNull Long  userId) {
         List<NotificationMessage> messages = chatService.getChatsForUser(userId);
         return ResponseEntity.ok().body(messages);
     }
 
     @GetMapping("/chat/{fromUserId}/{toUserId}/messages")
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<NotificationMessage>> getChatMessages(
-            @PathVariable Long fromUserId,
-            @PathVariable Long toUserId) {
+            @PathVariable @NotNull Long fromUserId,
+            @PathVariable @NotNull Long toUserId) {
 
         List<NotificationMessage> messages = chatService.getChatMessages(toUserId, fromUserId);
         return ResponseEntity.ok(messages);

@@ -3,6 +3,7 @@ package org.individualproject.controller;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<User> getUser(@PathVariable(value = "id")@NotNull final Long id)
     {
         final Optional<User> userOptional = userService.getUser(id);
         return userOptional.map(user -> ResponseEntity.ok().body(user))
@@ -30,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<User> getUserByUsername(@PathVariable(value = "username") final String username)
+    public ResponseEntity<User> getUserByUsername(@PathVariable(value = "username")@NotNull final String username)
     {
         final User user = userService.getUserByUsername(username);
         return ResponseEntity.ok().body(user);
@@ -50,7 +51,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @RolesAllowed({"USER"})
-    public ResponseEntity<Long> deleteUser(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<Long> deleteUser(@PathVariable(value = "id")@NotNull final Long id)
     {
         if (userService.deleteUser(id)) {
             return ResponseEntity.ok().build();
@@ -60,7 +61,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     @RolesAllowed({"USER"})
-    public ResponseEntity<Void> updateUser(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateUserRequest request){
+    public ResponseEntity<Void> updateUser(@PathVariable(value = "id")@NotNull final long id, @RequestBody @Valid UpdateUserRequest request){
 
         request.setId(id);
         userService.updateUser(request);

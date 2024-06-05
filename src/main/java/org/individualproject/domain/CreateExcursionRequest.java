@@ -15,29 +15,29 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateExcursionRequest {
-    @NotBlank
+    @NotBlank(message = "Excursion name cannot be blank")
     private String name;
 
-    @NotEmpty
+    @NotEmpty(message = "Destinations list cannot be blank")
     private List<String> destinations;
 
-    @NotNull
+    @NotNull(message = "Start date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
+    @Future(message = "Start date must be in the future")
     private Date startDate;
 
-    @NotNull
+    @NotNull(message = "End date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
+    @Future(message = "End date must be in the future")
     private Date endDate;
 
-    @NotNull
+    @NotNull(message = "Travel agency cannot be null")
     private User travelAgency;
 
-    @Min(0)
+    @Min(value = 0, message = "Price must be at least 0")
     private double price;
 
-    @Min(0)
+    @Min(value = 0, message = "Number of available spaces must be at least 0")
     private int numberOfAvaliableSpaces;
 
 }

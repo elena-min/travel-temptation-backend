@@ -3,6 +3,7 @@ package org.individualproject.business;
 import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.NotificationMessageConverter;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.NotificationMessage;
 import org.individualproject.domain.User;
@@ -44,8 +45,10 @@ public class ChatService {
 
 
     public List<NotificationMessage> getChatsForUser(Long userIdReceiver){
-        Long loggedinUserId = accessToken.getUserID();
-        return notificationsRepository.findAllUniqueChatsForUser(loggedinUserId)
+        if (!accessToken.getUserID().equals(userIdReceiver)) {
+            throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
+        }
+        return notificationsRepository.findAllUniqueChatsForUser(userIdReceiver)
                 .stream()
                 .map(NotificationMessageConverter::mapToDomain)
                 .toList();

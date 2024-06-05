@@ -16,17 +16,17 @@ import java.time.LocalDate;
 public class UpdateUserRequest {
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "First name cannot be null")
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "Last name cannot be null")
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "Birth date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Past
+    @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
-    @NotNull
+    @NotNull(message = "Gender cannot be null")
     private Gender gender;
 }

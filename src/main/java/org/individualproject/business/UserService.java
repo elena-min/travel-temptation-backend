@@ -1,13 +1,12 @@
 package org.individualproject.business;
 
+import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
-import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.UserRepository;
 import org.individualproject.persistence.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
+
 public class UserService {
 
     private UserRepository userRepository;
     private AccessToken requestAccessToken;
-    @Autowired
-    public UserService(UserRepository uRepository){
-        this.userRepository = uRepository;
-    }
-    public List<User> getUsers() {
+   public List<User> getUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
         return UserConverter.mapToDomainList(userEntities);
     }

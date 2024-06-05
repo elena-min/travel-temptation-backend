@@ -1,5 +1,7 @@
 package org.individualproject.controller;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.individualproject.business.TrendingService;
 import org.individualproject.domain.Excursion;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,7 @@ public class TrendingController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Excursion>> getTrendingExcursions(@RequestParam(name = "limit", defaultValue = "10") int limit)
+    public ResponseEntity<List<Excursion>> getTrendingExcursions(@RequestParam(name = "limit", defaultValue = "10") @Min(1) @Max(100) int limit)
     {
         List<Excursion> excursions = trendingService.getTrendingExcursion(limit);
         return ResponseEntity.ok().body(excursions);

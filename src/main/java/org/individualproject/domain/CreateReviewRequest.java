@@ -17,23 +17,23 @@ import java.util.Date;
 @Builder
 public class CreateReviewRequest {
 
-    @NotNull
+    @NotNull(message = "Travel agency cannot be null")
     private User travelAgency;
 
-    @NotNull
+    @NotNull(message = "User writer cannot be null")
     private User userWriter;
 
-    @NotNull
+    @NotNull(message = "Review date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date reviewDate;
 
-    @Min(1)
+    @Min(value = 1, message = "Number of stars must be at least 1")
     private int numberOfStars;
 
-    @NotEmpty
+    @NotEmpty(message = "Title cannot be empty")
     private String title;
 
-    @NotEmpty
+    @NotEmpty(message = "Description cannot be empty")
     private String description;
 }
 

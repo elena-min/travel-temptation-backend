@@ -3,6 +3,7 @@ package org.individualproject.controller;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
+import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.ReviewService;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.*;
@@ -24,7 +25,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Review> getReview(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<Review> getReview(@PathVariable(value = "id")@NotNull final Long id)
     {
         final Optional<Review> reviewOptional = reviewService.getReview(id);
         return reviewOptional.map(review -> ResponseEntity.ok().body(review))
@@ -46,7 +47,7 @@ public class ReviewController {
 
     @DeleteMapping("/{id}")
     @RolesAllowed({"USER", "ADMIN"})
-    public ResponseEntity<Long> deleteReview(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<Long> deleteReview(@PathVariable(value = "id")@NotNull final Long id)
     {
         if (reviewService.deleteReview(id)) {
             return ResponseEntity.ok().build();
@@ -55,7 +56,7 @@ public class ReviewController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable(value = "userId") final Long userId)
+    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable(value = "userId")@NotNull final Long userId)
     {
         Optional<User> userOptional = userService.getUser(userId);
         if (userOptional.isEmpty()) {
@@ -67,7 +68,7 @@ public class ReviewController {
     }
 
     @GetMapping("/travelagency/{travelAgencyId}")
-    public ResponseEntity<List<Review>> getReviewsByTravelAgency(@PathVariable(value = "travelAgencyId") final Long travelAgencyId)
+    public ResponseEntity<List<Review>> getReviewsByTravelAgency(@PathVariable(value = "travelAgencyId")@NotNull final Long travelAgencyId)
     {
         Optional<User> userOptional = userService.getUser(travelAgencyId);
         if (!userOptional.isPresent()) {

@@ -16,17 +16,17 @@ import java.time.LocalDate;
 public class CreatePaymentDetailsRequest {
     private User user;
 
-    @NotBlank
+    @NotBlank(message = "Card number cannot be blank")
     @Pattern(regexp = "\\d{16}", message = "Card number must be 16 digits")
     private String cardNumber;
 
-    @NotBlank
+    @NotBlank(message = "CVV cannot be blank")
     @Size(min = 3, message = "CVV must be between 3 and 4 digits")
     private String cvv;
 
-    @NotNull
+    @NotNull(message = "Expiration date cannot be null")
     private LocalDate expirationDate;
 
-    @NotBlank
+    @NotBlank(message = "Card Holder cannot be blank")
     private String cardHolderName;
 }

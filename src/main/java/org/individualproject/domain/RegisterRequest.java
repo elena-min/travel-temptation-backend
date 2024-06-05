@@ -18,29 +18,30 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
-    @NotBlank
-    @Length(min = 2, max = 50)
+    @NotBlank(message = "First name cannot be blank")
+    @Length(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     private String firstName;
 
-    @NotBlank
-    @Length(min = 2, max = 50)
+    @NotBlank(message = "Last name cannot be blank")
+    @Length(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
 
-    @NotNull
-    @Past
+    @NotNull(message = "Birth date cannot be null")
+    @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
-    @NotBlank
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
-    @NotBlank
-    @Length(min = 2, max = 20)
+    @NotBlank(message = "Username cannot be blank")
+    @Length(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
     private String username;
 
-    @NotBlank
-    @Length(min = 6)
+    @NotBlank(message = "Password cannot be blank")
+    @Length(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @NotNull(message = "Gender cannot be null")
     @Enumerated(EnumType.STRING)
     private Gender gender;
 }

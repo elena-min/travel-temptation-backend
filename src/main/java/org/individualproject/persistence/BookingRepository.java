@@ -12,11 +12,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Repository
 public interface BookingRepository  extends JpaRepository<BookingEntity, Long> {
     List<BookingEntity> findByUser(UserEntity user);
+
+    @Query("SELECT b FROM BookingEntity b WHERE b.user = :user AND (b.excursion.startDate < :currentDate OR b.excursion.startDate = :currentDate)")
+    List<BookingEntity> findByUserAndExcursion_StartDateBeforeOrExcursion_StartDateEquals(UserEntity user, Date currentDate);
+
+    List<BookingEntity> findByUserAndExcursion_StartDateAfter(UserEntity user, Date currentDate);
+
     List<BookingEntity> findByExcursion(ExcursionEntity excursion);
 
     @Query("SELECT COALESCE(SUM(e.price * b.numberOfTravelers), 0) " +

@@ -85,6 +85,33 @@ public class BookingController {
         return ResponseEntity.ok().body(bookings);
     }
 
+    @GetMapping("/past/{userId}")
+    @RolesAllowed({"USER"})
+    public ResponseEntity<List<Booking>> getPastBookingsByUser(@PathVariable(value = "userId") final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if(userOptional.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Booking> bookings = bookingService.getPastBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
+    }
+
+
+    @GetMapping("/future/{userId}")
+    @RolesAllowed({"USER"})
+    public ResponseEntity<List<Booking>> getFutureBookingsByUser(@PathVariable(value = "userId") final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if(userOptional.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Booking> bookings = bookingService.getFutureBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
+    }
+
     @GetMapping("/excursion/{excursionId}")
     @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<Booking>> getBookingsByExcursion(@PathVariable(value = "excursionId") final Long excursionId)

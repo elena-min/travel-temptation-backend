@@ -2,6 +2,7 @@ package org.individualproject.controller;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.CreateExcursionRequest;
@@ -29,7 +30,7 @@ public class ExcursionsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Excursion> getExcursion(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<Excursion> getExcursion(@PathVariable(value = "id")@NotNull final Long id)
     {
         final Optional<Excursion> excursionOptional = excursionService.getExcursion(id);
         return excursionOptional.map(excursion -> ResponseEntity.ok().body(excursion))
@@ -51,7 +52,7 @@ public class ExcursionsController {
 
     @DeleteMapping("/{id}")
     @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
-    public ResponseEntity<Long> deleteExcursion(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<Long> deleteExcursion(@PathVariable(value = "id")@NotNull final Long id)
     {
         if (excursionService.deleteExcursion(id)) {
             return ResponseEntity.ok().build();
@@ -61,7 +62,7 @@ public class ExcursionsController {
 
     @PutMapping("/{id}")
     @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
-    public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdateExcursionRequest request){
+    public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id")@NotNull final long id, @RequestBody @Valid UpdateExcursionRequest request){
 
         request.setId(id);
         excursionService.updateExcursion(request);
@@ -69,7 +70,7 @@ public class ExcursionsController {
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<Excursion> getExcursionByName(@PathVariable(value = "name") final String name)
+    public ResponseEntity<Excursion> getExcursionByName(@PathVariable(value = "name")@NotNull final String name)
     {
         final Optional<Excursion> excursionOptional = excursionService.getExcursionByName(name);
         return excursionOptional.map(excursion -> ResponseEntity.ok().body(excursion))
@@ -79,7 +80,7 @@ public class ExcursionsController {
 
 
     @GetMapping("/travelAgency/{travelAgencyID}")
-    public ResponseEntity<List<Excursion>> getExcursionsByTravelAgency(@PathVariable(value = "travelAgencyID") Long travelAgency)
+    public ResponseEntity<List<Excursion>> getExcursionsByTravelAgency(@PathVariable(value = "travelAgencyID")@NotNull Long travelAgency)
     {
         Optional<User> userOptional = userService.getUser(travelAgency);
         if(userOptional == null){
