@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
 import org.individualproject.domain.enums.Gender;
@@ -194,6 +195,20 @@ class ExcursionServiceTest {
                 Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"), startDate, endDate, validUser, 100.0, -1)) // Invalid number of available spaces
         );
     }
+    @Test
+    void createExcursion_shouldThrowExceptionIfUserIsNotTravelAgency() {
+        Date startDate = new Date();
+        Date endDate = new Date();
+        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
+
+        CreateExcursionRequest createRequest = new CreateExcursionRequest("Mountain Hike", Arrays.asList("Paris", "London"), startDate, endDate, validUser, 1500.0, 58);
+
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
+
+        // Act & Assert
+        assertThrows(UnauthorizedDataAccessException.class, () -> excursionService.createExcursion(createRequest));
+        verify(excursionRepository, never()).save(any());
+    }
 
     @Test
     void updateExcursion_shouldUpdateExistingExcursionWithValidInput(){
@@ -226,6 +241,8 @@ class ExcursionServiceTest {
                 23
                 );
 
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
+        when(accessToken.getUserID()).thenReturn(user.getId());
         when(excursionRepository.findById(1L)).thenReturn(Optional.of(existingExcursionEntity));
 
         boolean updateResult = excursionService.updateExcursion(updateExcursionRequest);
@@ -272,29 +289,143 @@ class ExcursionServiceTest {
     }
 
     @Test
-    void deleteExcursion_shouldDeleteExistingExcursion(){
+    void updateExcursion_shouldThrowExceptionIfUserIsNotTravelAgency() {
+        Date startDate = new Date(2028, 9, 16);
+        Date endDate = new Date(2028, 9, 24);
+
+
+        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
+
+        ExcursionEntity existingExcursionEntity = ExcursionEntity.builder()
+                .id(1L)
+                .name("Mountain Hike")
+                .destinations("Paris,London")
+                .startDate(startDate)
+                .endDate(endDate)
+                .travelAgency(UserConverter.convertToEntity(validUser))
+                .price(1500.0)
+                .numberOfAvaliableSpaces(58)
+                .numberOfSpacesLeft(58)
+                .build();
+
+        UpdateExcursionRequest updateExcursionRequest = new UpdateExcursionRequest(
+                1L,
+                "Test Excursion",
+                Arrays.asList("Paris", "London"),
+                startDate,
+                endDate,
+                1000.0,
+                23
+        );
+
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
+        when(excursionRepository.findById(1L)).thenReturn(Optional.of(existingExcursionEntity));
+
+        assertThrows(UnauthorizedDataAccessException.class, () -> excursionService.updateExcursion(updateExcursionRequest));
+        verify(excursionRepository, never()).save(any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdateExcursionRequests")
+    void updateExcursion_shouldThrowExceptionForInvalidInput(UpdateExcursionRequest invalidRequest) {
+
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        User user = UserConverter.mapToDomain(userEntity);
+
+        assertThrows(InvalidExcursionDataException.class, () -> excursionService.updateExcursion(invalidRequest));
+        verify(excursionRepository, never()).save(any());
+    }
+    private static Stream<Arguments> provideInvalidUpdateExcursionRequests() {
+        Date startDate = new Date(2028, 9, 16);
+        Date endDate = new Date(2028, 9, 24);
+
+        User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
+
+        return Stream.of(
+                Arguments.of(new UpdateExcursionRequest(1L, null, Arrays.asList("Paris", "London"), startDate, endDate, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", null, startDate, endDate, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), null, endDate, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), startDate, null, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), startDate, endDate, -1.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), startDate, endDate, 1000.0, -1))
+        );
+    }
+
+
+//    @Test
+//    void deleteExcursion_shouldDeleteExistingExcursion() {
+//        Long id = 1L;
+//        ExcursionEntity excursionEntity = new ExcursionEntity();
+//        excursionEntity.setId(id);
+//        UserEntity travelAgency = new UserEntity();
+//        travelAgency.setId(1L);
+//        excursionEntity.setTravelAgency(travelAgency);
+//
+//        when(excursionRepository.findById(id)).thenReturn(Optional.of(excursionEntity));
+//        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
+//        when(accessToken.getUserID()).thenReturn(excursionEntity.getTravelAgency().getId());
+//
+//
+//        // Act
+//        boolean result = excursionService.deleteExcursion(id);
+//
+//        // Assert
+//        assertTrue(result);
+//        verify(excursionRepository, times(1)).deleteById(id);
+//    }
+
+
+    @Test
+    void deleteExcursion_nonExistingExcursion(){
         Long id = 1L;
-        Mockito.doNothing().when(excursionRepository).deleteById(id);
+
+        when(excursionRepository.findById(id)).thenReturn(Optional.empty());
 
         // Act
         boolean result = excursionService.deleteExcursion(id);
 
         // Assert
-        assertTrue(result);
-        verify(excursionRepository, times(1)).deleteById(id);
+        assertFalse(result);
+        verify(excursionRepository, never()).deleteById(id);
     }
 
     @Test
-    void deleteExcursion_nonExistingExcursion(){
-        Long nonExistingId = 9987L;
-        doThrow(EmptyResultDataAccessException.class).when(excursionRepository).deleteById(nonExistingId);
+    void deleteExcursion_missingTravelAgencyRole() {
+        Long id = 1L;
+        ExcursionEntity excursionEntity = new ExcursionEntity();
+        excursionEntity.setId(id);
 
-        // Act
-        boolean result = excursionService.deleteExcursion(nonExistingId);
+        when(excursionRepository.findById(id)).thenReturn(Optional.of(excursionEntity));
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
 
-        // Assert
-        assertFalse(result);
-        verify(excursionRepository, times(1)).deleteById(nonExistingId);
+        // Act & Assert
+        UnauthorizedDataAccessException exception = assertThrows(UnauthorizedDataAccessException.class, () -> {
+            excursionService.deleteExcursion(id);
+        });
+
+        assertEquals("ONLY_TRAVEL_AGENCIES_ALLOWED", exception.getReason());
+        verify(excursionRepository, never()).deleteById(id);
+    }
+    @Test
+    void deleteExcursion_notOwnedByLoggedInUser() {
+        Long id = 1L;
+        ExcursionEntity excursionEntity = new ExcursionEntity();
+        excursionEntity.setId(id);
+        excursionEntity.setTravelAgency(new UserEntity());
+
+        when(excursionRepository.findById(id)).thenReturn(Optional.of(excursionEntity));
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
+        when(accessToken.getUserID()).thenReturn(2L);
+
+        // Act & Assert
+        UnauthorizedDataAccessException exception = assertThrows(UnauthorizedDataAccessException.class, () -> {
+            excursionService.deleteExcursion(id);
+        });
+
+        assertEquals("EXCURSION_NOT_OWNED_BY_LOGGED_IN_USER", exception.getReason());
+        verify(excursionRepository, never()).deleteById(id);
     }
 
     @Test
@@ -399,39 +530,110 @@ class ExcursionServiceTest {
 
     }
 
-//    @Test
-//    void getExcursionsByTravelAgency_shouldThrowExceptionForNonTravelAgencyUser() {
-//        // Arrange
-//        LocalDate date = LocalDate.of(2014, 9, 16);
-//
-//        User travelAgency = User.builder().id(1L).firstName("Travel").lastName("Agency").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-//        when(accessToken.hasRole(UserRole.ADMIN.name())).thenReturn(false);
-//        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
-//        // Simulate a different user ID in the access token
-//        when(accessToken.getUserID()).thenReturn(2L);
-//
-//        // Act & Assert
-//        UnauthorizedDataAccessException exception = assertThrows(UnauthorizedDataAccessException.class,
-//                () -> excursionService.getExcursionsByTravelAgency(travelAgency));
-//        assertEquals( new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER"), exception);
-//    }
-//
-//    @Test
-//    void getExcursionsByTravelAgency_shouldThrowExceptionForTravelAgencyRoleButNotOwnName() {
-//        // Arrange
-//        User travelAgency = User.builder().id(1L).firstName("Travel").lastName("Agency").build();
-//        User travelAgency2 = User.builder().id(2L).firstName("Travel2").lastName("Agency2").build();
-//
-//        // Mock that the user does not have the travel agency role
-//        when(accessToken.hasRole(UserRole.ADMIN.name())).thenReturn(false);
-//        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
-//
-//        // Act & Assert
-//        UnauthorizedDataAccessException exception = assertThrows(UnauthorizedDataAccessException.class,
-//                () -> excursionService.getExcursionsByTravelAgency(travelAgency2));
-//        assertEquals("Only travel agencies see own listings!", exception.getMessage());
-//    }
+    @Test
+    void getExcursionsByTravelAgency_NonExistingTravelAgencyUser() {
+        // Arrange
+        User nonExistingUser = new User(999L, "NonExisting", "User", null, null, null, null, null);
+        UserEntity nonExistingUserEntity = UserConverter.convertToEntity(nonExistingUser);
+        when(excursionRepository.findByTravelAgency(nonExistingUserEntity)).thenReturn(Collections.emptyList());
 
+        // Act
+        List<Excursion> result = excursionService.getExcursionsByTravelAgency(nonExistingUser);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+    @Test
+    void searchExcursionsByNameAndTravelAgency() {
+        // Arrange
+        String searchTerm = "Excursion";
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        Date startDate = new Date(2028, 9, 16);
+        Date endDate = new Date(2028, 9, 24);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        List<ExcursionEntity> mockExcursionEntities = Arrays.asList(
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+        );
+        when(excursionRepository.findByNameContainingIgnoreCaseOrTravelAgency_FirstNameContainingIgnoreCaseOrTravelAgency_LastNameContainingIgnoreCase(
+                searchTerm, searchTerm, searchTerm)).thenReturn(mockExcursionEntities);
+
+        // Act
+        List<Excursion> result = excursionService.searchExcursionsByNameAndTravelAgency(searchTerm);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void searchExcursions_NullOrEmptySearchTerm_WithPriceRange() {
+        // Mock data
+        double minPrice = 100.0;
+        double maxPrice = 200.0;
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        Date startDate = new Date(2028, 9, 16);
+        Date endDate = new Date(2028, 9, 24);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        List<ExcursionEntity> mockExcursions = Arrays.asList(
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+        );
+        when(excursionRepository.findByPriceBetween(minPrice, maxPrice)).thenReturn(mockExcursions);
+
+        List<Excursion> result = excursionService.searchExcursions(null, minPrice, maxPrice);
+
+        // Assertions
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void searchExcursions_NullSearchTerm_NoPriceRange() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        Date startDate = new Date(2028, 9, 16);
+        Date endDate = new Date(2028, 9, 24);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        List<ExcursionEntity> mockExcursions = Arrays.asList(
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+        );
+        when(excursionRepository.findAll()).thenReturn(mockExcursions);
+
+        List<Excursion> result = excursionService.searchExcursions(null, 0.0, Double.MAX_VALUE);
+
+        // Assertions
+        assertEquals(2, result.size());
+    }
+
+    @Test
+    void searchExcursions_NonEmptySearchTerm_WithPriceRange() {
+        String searchTerm = "Excursion";
+        double minPrice = 100.0;
+        double maxPrice = 200.0;
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        Date startDate = new Date(2028, 9, 16);
+        Date endDate = new Date(2028, 9, 24);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        List<ExcursionEntity> mockExcursions = Arrays.asList(
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+        );
+        when(excursionRepository.findByNameContainingIgnoreCaseAndPriceBetweenOrTravelAgency_FirstNameContainingIgnoreCaseAndPriceBetweenOrTravelAgency_LastNameContainingIgnoreCaseAndPriceBetween(
+                searchTerm, minPrice, maxPrice,
+                searchTerm, minPrice, maxPrice,
+                searchTerm, minPrice, maxPrice
+        )).thenReturn(mockExcursions);
+
+        List<Excursion> result = excursionService.searchExcursions(searchTerm, minPrice, maxPrice);
+
+        // Assertions
+        assertEquals(2, result.size());
+    }
 
 
 }

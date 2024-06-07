@@ -1,16 +1,19 @@
 package org.individualproject.business;
 
+import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.UsernameAlreadyExistsException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.configuration.security.token.impl.AccessTokenEncoderDecoderImpl;
-import org.individualproject.domain.LoginRegisterResponse;
-import org.individualproject.domain.LoginRequest;
-import org.individualproject.domain.RegisterRequest;
+import org.individualproject.domain.*;
 import org.individualproject.domain.enums.Gender;
 import org.individualproject.persistence.UserRepository;
 import org.individualproject.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,6 +71,28 @@ class RegisterServiceTest {
 
         assertThrows(UsernameAlreadyExistsException.class, () -> registerService.registerUser(registerRequest));
     }
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdateRegisterRequests")
+    void registerUserShouldThrowExceptionInvalidData(RegisterRequest invalidRequest) {
+
+        assertThrows(InvalidExcursionDataException.class, () -> registerService.registerUser(invalidRequest));
+        verify(userRepository, never()).save(any());
+    }
+
+    private static Stream<Arguments> provideInvalidUpdateRegisterRequests() {
+        LocalDate date = LocalDate.of(2004, 9, 16);
+
+        return Stream.of(
+                Arguments.of(new RegisterRequest(null, "JOnas", date,"nickJonas@gmail.com", "nickJonas", "nick1234", Gender.MALE)),
+                Arguments.of(new RegisterRequest("Nick", null, date,"nickJonas@gmail.com", "nickJonas", "nick1234", Gender.MALE)),
+                Arguments.of(new RegisterRequest("Nick", "JOnas", null,"nickJonas@gmail.com", "nickJonas", "nick1234", Gender.MALE)),
+                Arguments.of(new RegisterRequest("Nick", "JOnas", date,null, "nickJonas", "nick1234", Gender.MALE)),
+                Arguments.of(new RegisterRequest("Nick", "JOnas", date,"nickJonas@gmail.com", null, "nick1234", Gender.MALE)),
+                Arguments.of(new RegisterRequest("Nick", "JOnas", date,"nickJonas@gmail.com", "nickJonas", null, Gender.MALE)),
+                Arguments.of(new RegisterRequest("Nick", "JOnas", date,"nickJonas@gmail.com", "nickJonas", "nick1234", null))
+
+        );
+    }
 
     @Test
     void registerTravelingAgency_ValidData_ShouldReturnAccessToken() {
@@ -99,4 +125,13 @@ class RegisterServiceTest {
 
         assertThrows(UsernameAlreadyExistsException.class, () -> registerService.registerTravelingAgency(registerRequest));
     }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdateRegisterRequests")
+    void registerTravelAGencyShouldThrowExceptionInvalidData(RegisterRequest invalidRequest) {
+
+        assertThrows(InvalidExcursionDataException.class, () -> registerService.registerTravelingAgency(invalidRequest));
+        verify(userRepository, never()).save(any());
+    }
+
 }

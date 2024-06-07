@@ -1,5 +1,7 @@
 package org.individualproject.business;
 
+import lombok.AllArgsConstructor;
+import org.individualproject.business.converter.BookingConverter;
 import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
@@ -19,13 +21,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class PaymentDetailsService {
+    private static final String UNAUTHORIZED_ACCESS = "UNAUTHORIZED_ACCESS";
+
     private PaymentDetailsRepository paymentDetailsRepository;
     private AccessToken requestAccessToken;
-    @Autowired
-    public PaymentDetailsService(PaymentDetailsRepository paymentDRepository){
-        this.paymentDetailsRepository = paymentDRepository;
-    }
     public List<PaymentDetails> getAllPaymentDetails() {
         List<PaymentDetailsEntity> paymentDetailsEntities = paymentDetailsRepository.findAll();
         return PaymentDetailsConverter.mapToDomainList(paymentDetailsEntities);
@@ -37,15 +38,14 @@ public class PaymentDetailsService {
         if (paymentDetailsOptional.isPresent()) {
             PaymentDetailsEntity paymentDetailsEntity = paymentDetailsOptional.get();
 
-            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
-                if (!requestAccessToken.getUserID().equals(paymentDetailsEntity.getUser().getId())) {
-                    throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
-                }
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name()) &&
+                    !requestAccessToken.getUserID().equals(paymentDetailsEntity.getUser().getId())) {
+                throw new UnauthorizedDataAccessException(UNAUTHORIZED_ACCESS);
             }
-
-            return paymentDetailsOptional.map(PaymentDetailsConverter::mapToDomain);
+            return Optional.of(PaymentDetailsConverter.mapToDomain(paymentDetailsEntity));
+            //return paymentDetailsOptional.map(PaymentDetailsConverter::mapToDomain);
         } else {
-            throw new NotFoundException("Payment details not found.");
+            return Optional.empty();
         }
     }
 
@@ -72,10 +72,10 @@ public class PaymentDetailsService {
         if (paymentDetailsOptional.isPresent()) {
             PaymentDetailsEntity paymentDetailsEntity = paymentDetailsOptional.get();
 
-            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
-                if (!requestAccessToken.getUserID().equals(paymentDetailsEntity.getUser().getId())) {
-                    throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
-                }
+
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name()) &&
+                    !requestAccessToken.getUserID().equals(paymentDetailsEntity.getUser().getId())) {
+                throw new UnauthorizedDataAccessException(UNAUTHORIZED_ACCESS);
             }
 
             paymentDetailsRepository.deleteById(id);
@@ -86,15 +86,18 @@ public class PaymentDetailsService {
     }
 
     public boolean updatePaymentDetails(UpdatePaymentDetailsRequest request) {
+        if (request.getCardHolderName() == null || request.getCardNumber() == null || request.getCvv() == null ||
+                request.getUser() == null || request.getExpirationDate() == null) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
         UserEntity userEntity = UserConverter.convertToEntity(request.getUser());
         Optional<PaymentDetailsEntity> optionalPaymentDetails = paymentDetailsRepository.findById(request.getId());
         if (optionalPaymentDetails.isPresent()) {
             PaymentDetailsEntity existingPaymentDetails = optionalPaymentDetails.get();
 
-            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name())) {
-                if (!requestAccessToken.getUserID().equals(existingPaymentDetails.getUser().getId())) {
-                    throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
-                }
+            if (!requestAccessToken.hasRole(UserRole.TRAVELAGENCY.name()) &&
+                    !requestAccessToken.getUserID().equals(existingPaymentDetails.getUser().getId())) {
+                throw new UnauthorizedDataAccessException(UNAUTHORIZED_ACCESS);
             }
             existingPaymentDetails.setId(request.getId());
             existingPaymentDetails.setUser(userEntity);

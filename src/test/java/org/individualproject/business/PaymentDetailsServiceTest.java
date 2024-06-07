@@ -4,10 +4,15 @@ import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
+import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
+import org.individualproject.domain.enums.BookingStatus;
 import org.individualproject.domain.enums.Gender;
+import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.PaymentDetailsRepository;
+import org.individualproject.persistence.entity.BookingEntity;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
@@ -23,6 +28,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -33,6 +39,9 @@ import static org.mockito.Mockito.*;
 class PaymentDetailsServiceTest {
     @Mock
     private PaymentDetailsRepository paymentDetailsRepository;
+
+    @Mock
+    private AccessToken accessToken;
 
     @InjectMocks
     private PaymentDetailsService paymentDetailsService;
@@ -87,6 +96,7 @@ class PaymentDetailsServiceTest {
                 .cardHolderName("Nick Jonas")
                 .user(userEntity)
                 .build();
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
         when(paymentDetailsRepository.findById(1L)).thenReturn(Optional.of(paymentDetailsEntity));
         Optional<PaymentDetails> result = paymentDetailsService.getPaymentDetails(1L);
 
@@ -96,6 +106,25 @@ class PaymentDetailsServiceTest {
         assertEquals(paymentDetailsEntity.getCvv(), result.get().getCvv());
         assertEquals(paymentDetailsEntity.getCardNumber(), result.get().getCardNumber());
         assertEquals(paymentDetailsEntity.getCardHolderName(), result.get().getCardHolderName());
+    }
+    @Test
+    void getPaymentDetails_shouldThrowUnauthorizedAccessExceptionForUserId() {
+        // Arrange
+        Long detailsId = 1L;
+        Long currentUserID = 1L;
+        Long anotherUserID = 2L;
+        UserEntity currentUserEntity = new UserEntity();
+        currentUserEntity.setId(currentUserID);
+
+        PaymentDetailsEntity paymentDetailsEntity = new PaymentDetailsEntity();
+        paymentDetailsEntity.setId(detailsId);
+        paymentDetailsEntity.setUser(currentUserEntity);
+
+        when(accessToken.getUserID()).thenReturn(anotherUserID);
+        when(paymentDetailsRepository.findById(detailsId)).thenReturn(Optional.of(paymentDetailsEntity));
+
+        assertThrows(UnauthorizedDataAccessException.class, () -> paymentDetailsService.getPaymentDetails(detailsId));
+        verify(paymentDetailsRepository, times(1)).findById(detailsId);
     }
 
     @Test
@@ -107,7 +136,6 @@ class PaymentDetailsServiceTest {
         assertTrue(result.isEmpty());
         verify(paymentDetailsRepository, times(1)).findById(id);
     }
-
 
     @Test
     void createPaymentDetails_shouldSavePaymentDetails() {
@@ -164,28 +192,64 @@ class PaymentDetailsServiceTest {
 
     @Test
     void deletePaymentDetails_shouldDeleteExistingPaymentDetails() {
-        Long id = 1L;
-        Mockito.doNothing().when(paymentDetailsRepository).deleteById(id);
+        // Arrange
+        Long detailsId = 1L;
+        Long userId = 1L;
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+
+        PaymentDetailsEntity paymentDetailsEntity = new PaymentDetailsEntity();
+        paymentDetailsEntity.setId(detailsId);
+        paymentDetailsEntity.setUser(userEntity);
+
+        when(accessToken.getUserID()).thenReturn(userId);
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
+        when(paymentDetailsRepository.findById(detailsId)).thenReturn(Optional.of(paymentDetailsEntity));
 
         // Act
-        boolean result = paymentDetailsService.deletePaymentDetails(id);
+        boolean result = paymentDetailsService.deletePaymentDetails(detailsId);
 
         // Assert
         assertTrue(result);
-        verify(paymentDetailsRepository, times(1)).deleteById(id);
+        verify(paymentDetailsRepository, times(1)).deleteById(detailsId);
     }
 
     @Test
+    void deletePaymentDetails_shouldThrowUnauthorizedAccessExceptionForUnauthorizedUser() {
+        // Arrange
+        Long detailsId = 1L;
+        Long userId = 1L;
+        Long anotherUserId = 2L;
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(userId);
+
+        PaymentDetailsEntity paymentDetailsEntity = new PaymentDetailsEntity();
+        paymentDetailsEntity.setId(detailsId);
+        paymentDetailsEntity.setUser(userEntity);
+
+        when(accessToken.getUserID()).thenReturn(anotherUserId);
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
+        when(paymentDetailsRepository.findById(detailsId)).thenReturn(Optional.of(paymentDetailsEntity));
+
+        // Act & Assert
+        assertThrows(UnauthorizedDataAccessException.class, () -> paymentDetailsService.deletePaymentDetails(detailsId));
+        verify(paymentDetailsRepository, never()).deleteById(detailsId);
+    }
+    @Test
     void deletePaymentDetails_nonExistingPaymentDetails(){
-        Long nonExistingId = 9987L;
-        doThrow(EmptyResultDataAccessException.class).when(paymentDetailsRepository).deleteById(nonExistingId);
+        // Arrange
+        Long detailsId = 1L;
+
+        when(paymentDetailsRepository.findById(detailsId)).thenReturn(Optional.empty());
 
         // Act
-        boolean result = paymentDetailsService.deletePaymentDetails(nonExistingId);
+        boolean result = paymentDetailsService.deletePaymentDetails(detailsId);
 
         // Assert
         assertFalse(result);
-        verify(paymentDetailsRepository, times(1)).deleteById(nonExistingId);
+        verify(paymentDetailsRepository, never()).deleteById(detailsId);
     }
 
     @Test
@@ -213,8 +277,8 @@ class PaymentDetailsServiceTest {
                 .user(userEntity)
                 .build();
         when(paymentDetailsRepository.findById(1L)).thenReturn(Optional.of(existingPaymentDetails));
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(true);
 
-        PaymentDetailsService paymentDetailsService = new PaymentDetailsService(paymentDetailsRepository);
         boolean result = paymentDetailsService.updatePaymentDetails(request);
 
         assertTrue(result);
@@ -247,5 +311,68 @@ class PaymentDetailsServiceTest {
         verify(paymentDetailsRepository, never()).save(any(PaymentDetailsEntity.class));
 
     }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidUpdatePaymentDetailsRequests")
+    void updatePaymentDetails_shouldThrowExceptionForInvalidInput(UpdatePaymentDetailsRequest invalidRequest) {
+
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        User user = UserConverter.mapToDomain(userEntity);
+
+        assertThrows(InvalidExcursionDataException.class, () -> paymentDetailsService.updatePaymentDetails(invalidRequest));
+        verify(paymentDetailsRepository, never()).save(any());
+    }
+
+    private static Stream<Arguments> provideInvalidUpdatePaymentDetailsRequests() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        LocalDate expDate = LocalDate.of(2027, 9, 16);
+
+        UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        User user = UserConverter.mapToDomain(fakeUserEntity);
+
+        return Stream.of(
+                Arguments.of(new UpdatePaymentDetailsRequest(1L, null, "2345678998765427", "123", expDate, "Kevinn Jonas")),
+                Arguments.of(new UpdatePaymentDetailsRequest(1L, user, null, "123", expDate, "Kevinn Jonas")),
+                Arguments.of(new UpdatePaymentDetailsRequest(1L, user, "2345678998765427", null, expDate, "Kevinn Jonas")),
+                Arguments.of(new UpdatePaymentDetailsRequest(1L, user, "2345678998765427", "123", null, "Kevinn Jonas")),
+                Arguments.of(new UpdatePaymentDetailsRequest(1L, user, "2345678998765427", "123", expDate, null))
+        );
+    }
+
+    @Test
+    void updatePaymentDetails_shouldThrowUnauthorizedAccessExceptionForInvalidUser() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        LocalDate expDate = LocalDate.of(2027, 9, 16);
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        User user = UserConverter.mapToDomain(userEntity);
+
+        UpdatePaymentDetailsRequest request = new UpdatePaymentDetailsRequest();
+        request.setId(1L);
+        request.setUser(user);
+        request.setCvv("123");
+        request.setExpirationDate(expDate);
+        request.setCardHolderName("Kevinn Jonas");
+        request.setCardNumber("2345678998765427");
+
+        PaymentDetailsEntity existingPaymentDetails = PaymentDetailsEntity.builder()
+                .id(1L)
+                .expirationDate(request.getExpirationDate())
+                .cardNumber(request.getCardNumber())
+                .cardHolderName(request.getCardHolderName())
+                .cvv(request.getCvv())
+                .user(userEntity)
+                .build();
+        when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
+        when(accessToken.getUserID()).thenReturn(100L);
+
+        when(paymentDetailsRepository.findById(request.getId())).thenReturn(Optional.of(existingPaymentDetails));
+
+        assertThrows(UnauthorizedDataAccessException.class, () -> paymentDetailsService.updatePaymentDetails(request));
+        verify(paymentDetailsRepository, never()).save(any());
+    }
+
 
 }

@@ -11,6 +11,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -29,9 +30,9 @@ public class UserService {
         return userEntity.map(UserConverter::mapToDomain);
     }
 
-    public User getUserByUsername(String username) {
-        UserEntity userEntity = userRepository.findByUsername(username);
-        return UserConverter.mapToDomain(userEntity);
+    public Optional<User> getUserByUsername(String username) {
+        Optional<UserEntity> userEntity = userRepository.findByUsername(username);
+        return userEntity.map(UserConverter::mapToDomain);
     }
 
     public User createUser(CreateUserRequest request){
@@ -55,6 +56,9 @@ public class UserService {
 
     public boolean deleteUser(Long id) {
         try {
+            if (!Objects.equals(requestAccessToken.getUserID(), id)) {
+                throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
+            }
             userRepository.deleteById(id);
             return true;
         } catch (EmptyResultDataAccessException e) {

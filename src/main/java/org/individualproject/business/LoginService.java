@@ -22,10 +22,8 @@ public class LoginService {
     private final AccessTokenEncoder accessTokenEncoder;
 
     public LoginRegisterResponse login(LoginRequest loginRequest){
-        UserEntity userEntity = userRepository.findByUsername(loginRequest.getUsername());
-        if(userEntity == null){
-            throw new InvalidCredentialsException();
-        }
+        UserEntity userEntity = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(InvalidCredentialsException::new);
 
         if(!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getHashedPassword())){
             throw new InvalidCredentialsException();

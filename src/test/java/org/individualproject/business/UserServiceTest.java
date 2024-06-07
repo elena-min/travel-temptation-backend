@@ -2,6 +2,8 @@ package org.individualproject.business;
 
 import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
+import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.CreateUserRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateUserRequest;
@@ -18,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -31,6 +34,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private AccessToken accessToken;
 
     @InjectMocks
     private UserService userService;
@@ -69,7 +75,6 @@ class UserServiceTest {
         assertEquals(expected, actual);
         verify(userRepository, times(1)).findAll();
     }
-
     @Test
     void getUser_shouldReturnUserConverted() {
         //Arrange
@@ -97,6 +102,35 @@ class UserServiceTest {
         // Assert
         assertFalse(actual.isPresent());
         verify(userRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    void getUserByUsername_shouldReturnUserConverted() {
+        //Arrange
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        User expected = new User(1L, "John", "Doe", date, "j.doe@example.com", "JOhnDoe","hashedPassword1", Gender.MALE );
+
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("JOhnDoe").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+        when(userRepository.findByUsername("JOhnDoe")).thenReturn(Optional.of(userEntity));
+        Optional<User> expectedOptional = Optional.of(expected);
+
+        // Act
+        Optional<User> actual = userService.getUserByUsername("JOhnDoe");
+        // Assert
+        assertEquals(expectedOptional, actual);
+        verify(userRepository, times(1)).findByUsername("JOhnDoe");
+    }
+    @Test
+    void getUserByUsername_userNotFound() {
+        //Arrange
+        String username = "JOhnDoe";
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        // Act
+        Optional<User> actual = userService.getUserByUsername(username);
+        // Assert
+        assertFalse(actual.isPresent());
+        verify(userRepository, times(1)).findByUsername(username);
     }
     @Test
     void createUser_shouldCreateUser() {
@@ -153,29 +187,23 @@ class UserServiceTest {
 
     @Test
     void deleteUser_existingUser() {
-//        Long id = 1L;
-//        LocalDate date = LocalDate.of(2014, 9, 16);
-//        CreateUserRequest userRequest = new CreateUserRequest(
-//                "Nick",
-//                "Jonas",
-//                date,
-//                "nickJ@gmail.com",
-//                "passNIck",
-//                Gender.MALE
-//        );
-//        UserEntity userEntity = UserEntity.builder().id(1L).firstName("Nick").lastName("JOnas").birthDate(date).email("nickJ@gmail.com").hashedPassword("hash").gender(Gender.MALE).build();
-//        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
-//
-//        User actual = userService.createUser(userRequest);
-//
-//        Mockito.doNothing().when(userRepository).deleteById(id);
-//
-//        boolean result = userService.deleteUser(id);
-//
-//        //Assert
-//        assertTrue(result);
-//        verify(userRepository, times(1)).deleteById(id);
+        Long id = 1L;
+        LocalDate date = LocalDate.of(2014, 9, 16);
+        CreateUserRequest userRequest = new CreateUserRequest(
+                "Nick",
+                "Jonas",
+                date,
+                "nickJonas",
+                "nickJ@gmail.com",
+                "passNIck",
+                Gender.MALE
+        );
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("Nick").lastName("JOnas").birthDate(date).username("nickJonas").email("nickJ@gmail.com").hashedPassword("hash").gender(Gender.MALE).build();
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+
+        User actual = userService.createUser(userRequest);
         Long userId = 1L;
+        when(accessToken.getUserID()).thenReturn(1L);
         Mockito.doNothing().when(userRepository).deleteById(userId);
 
         // Act
@@ -188,7 +216,9 @@ class UserServiceTest {
     }
     @Test
     void deleteUser_nonExistingUser(){
-        Long nonExistingUserId = 9987L;
+        Long nonExistingUserId = 1L;
+        when(accessToken.getUserID()).thenReturn(1L);
+
         doThrow(EmptyResultDataAccessException.class).when(userRepository).deleteById(nonExistingUserId);
 
         // Act
@@ -200,12 +230,28 @@ class UserServiceTest {
     }
 
     @Test
+    void deleteUser_unauthorizedAccessToken() {
+        Long userId = 1L;
+        Long differentUserId = 2L;
+
+        when(accessToken.getUserID()).thenReturn(differentUserId);
+
+        // Act & Assert
+        UnauthorizedDataAccessException exception = assertThrows(UnauthorizedDataAccessException.class, () -> {
+            userService.deleteUser(userId);
+        });
+
+        assertEquals("USER_ID_NOT_FROM_LOGGED_IN_USER", exception.getReason());
+        verify(userRepository, never()).deleteById(anyLong());
+    }
+    @Test
     void updateUser_existingUserWIthValidData() {
         LocalDate date = LocalDate.of(2014, 9, 16);
 
         UpdateUserRequest updateUserRequest = new UpdateUserRequest(1L, "JOe", "Smith", LocalDate.of(1990, 5, 15), Gender.MALE);
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("johnDoe").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
 
+        when(accessToken.getUserID()).thenReturn(1L);
         when(userRepository.findById(updateUserRequest.getId())).thenReturn(Optional.of(userEntity));
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
 
@@ -226,12 +272,29 @@ class UserServiceTest {
 
         UpdateUserRequest updateUserRequest = new UpdateUserRequest(1L, "JOe", "Smith", LocalDate.of(1990, 5, 15), Gender.MALE);
 
+        when(accessToken.getUserID()).thenReturn(1L);
         when(userRepository.findById(updateUserRequest.getId())).thenReturn(Optional.empty());
 
         boolean result = userService.updateUser(updateUserRequest);
 
         assertFalse(result);
         verify(userRepository, times(1)).findById(updateUserRequest.getId());
+        verify(userRepository, never()).save(any(UserEntity.class));
+
+    }
+
+    @Test
+    void updateUser_accessTokenIdDifferentFromRequestId() {
+        LocalDate date = LocalDate.of(2014, 9, 16);
+
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest(1L, "JOe", "Smith", LocalDate.of(1990, 5, 15), Gender.MALE);
+        UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("johnDoe").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
+
+        when(accessToken.getUserID()).thenReturn(2L);
+        assertThrows(UnauthorizedDataAccessException.class, () -> {
+            userService.updateUser(updateUserRequest);
+        });
+        verify(userRepository, never()).findById(anyLong());
         verify(userRepository, never()).save(any(UserEntity.class));
 
     }

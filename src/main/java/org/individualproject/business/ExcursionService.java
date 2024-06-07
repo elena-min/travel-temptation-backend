@@ -83,6 +83,11 @@ public class ExcursionService {
     public boolean updateExcursion(UpdateExcursionRequest request) {
         Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(request.getId());
 
+        if (request.getName() == null || request.getDestinations() == null || request.getStartDate() == null ||
+                request.getEndDate() == null || request.getPrice() < 0 ||
+                request.getNumberOfAvaliableSpaces() < 0) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
         if (optionalExcursion.isPresent()) {
             ExcursionEntity existingExcursion = optionalExcursion.get();
 

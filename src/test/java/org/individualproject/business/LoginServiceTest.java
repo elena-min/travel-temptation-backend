@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +43,7 @@ class LoginServiceTest {
         LoginRequest loginRequest = new LoginRequest("username", "password");
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword").gender(Gender.MALE).userRoles(new HashSet<>()).build();
 
-        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(userEntity);
+        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(Optional.of(userEntity));
         when(passwordEncoder.matches(loginRequest.getPassword(), userEntity.getHashedPassword())).thenReturn(true);
         when(accessTokenEncoderDecoder.encode(any(AccessToken.class))).thenReturn("encodedAccessToken");
 
@@ -60,16 +61,16 @@ class LoginServiceTest {
 
     @Test
     void login_withInvalidCredentials_shouldThrowInvalidCredentialsException() {
+        // Mocking
+        String invalidUsername = "invalidusername";
+        String invalidPassword = "invalidpassword";
+        when(userRepository.findByUsername(invalidUsername)).thenReturn(Optional.empty());
 
-        LoginRequest loginRequest = new LoginRequest("invalidusername", "invalidpassword");
-
-        when(userRepository.findByUsername(loginRequest.getUsername())).thenReturn(null);
-
+        // Test & Assertion
+        LoginRequest loginRequest = new LoginRequest(invalidUsername, invalidPassword);
         assertThrows(InvalidCredentialsException.class, () -> loginService.login(loginRequest));
-
-        verify(userRepository, times(1)).findByUsername(loginRequest.getUsername());
-        verify(passwordEncoder, never()).matches(anyString(), anyString());
-        verify(accessTokenEncoderDecoder, never()).encode(any(AccessToken.class));
-
+        verify(userRepository, times(1)).findByUsername(invalidUsername);
+        verify(passwordEncoder, never()).matches(any(), any());
+        verify(accessTokenEncoderDecoder, never()).encode(any());
     }
 }

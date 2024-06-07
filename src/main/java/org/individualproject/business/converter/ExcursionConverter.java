@@ -7,7 +7,6 @@ import org.individualproject.persistence.entity.UserEntity;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ExcursionConverter {
     public static Excursion mapToDomain(ExcursionEntity excursionEntity) {

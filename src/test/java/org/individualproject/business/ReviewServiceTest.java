@@ -4,8 +4,11 @@ import org.individualproject.business.converter.ReviewConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.NotFoundException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
+import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
 import org.individualproject.domain.enums.Gender;
+import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.ReviewRepository;
 import org.individualproject.persistence.entity.ReviewEntity;
 import org.individualproject.persistence.entity.UserEntity;
@@ -30,6 +33,9 @@ import static org.mockito.Mockito.*;
 class ReviewServiceTest {
     @Mock
     private ReviewRepository reviewRepository;
+
+    @Mock
+    private AccessToken accessToken;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -171,33 +177,116 @@ class ReviewServiceTest {
     @Test
     void deleteReview_shouldDeleteExistingReview() {
         Long id = 1L;
-        ReviewEntity mockReview = new ReviewEntity();
-        mockReview.setId(id);
-
-        Mockito.when(reviewRepository.findById(id)).thenReturn(Optional.of(mockReview));
-
-        Mockito.doNothing().when(reviewRepository).deleteById(id);
+        ReviewEntity reviewEntity = new ReviewEntity();
+        reviewEntity.setId(id);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1L);
+        reviewEntity.setUserWriter(userEntity);
+        when(reviewRepository.findById(id)).thenReturn(Optional.of(reviewEntity));
+        when(accessToken.getUserID()).thenReturn(1L);
 
         // Act
         boolean result = reviewService.deleteReview(id);
 
         // Assert
         assertTrue(result);
-        verify(reviewRepository, times(1)).findById(id);
         verify(reviewRepository, times(1)).deleteById(id);
+    }
+    @Test
+    void deleteReview_shouldThrowUnauthorizedAccessExceptionWhenRoleButNotOwner() {
+        Long id = 1L;
+        ReviewEntity reviewEntity = new ReviewEntity();
+        reviewEntity.setId(id);
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(2L);
+        reviewEntity.setUserWriter(userEntity);
+        when(reviewRepository.findById(id)).thenReturn(Optional.of(reviewEntity));
+        when(accessToken.getUserID()).thenReturn(3L);
+
+        assertThrows(UnauthorizedDataAccessException.class, () -> reviewService.deleteReview(id));
+        verify(reviewRepository, never()).deleteById(id);
+    }
+    @Test
+    void deleteReview_shouldThrowNotFoundExceptionWhenReviewNotFound() {
+        Long id = 1L;
+        when(reviewRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        boolean result = reviewService.deleteReview(id);
+
+        // Assert
+        assertFalse(result);
+        verify(reviewRepository, never()).deleteById(id);
+    }
+    @Test
+    void getReviewsByUser_shouldReturnReviewsForUser() {
+        // Arrange
+        Date date = new Date(2024, 9, 16);
+
+        User user = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john@example.com", "johndoe", "hashedPassword", Gender.MALE);
+        UserEntity userEntity = UserConverter.convertToEntity(user);
+
+
+        User travelagency = new User(2L, "Global", "Trips", LocalDate.of(1990, 1, 1), "global@example.com", "globalTrips", "hashedPassword", Gender.MALE);
+        UserEntity travelagencyEntity = UserConverter.convertToEntity(travelagency);
+
+        List<ReviewEntity> reviewEntities = Arrays.asList(
+                new ReviewEntity(1L, travelagencyEntity, userEntity, date, 4, "Wow","Great experience" ),
+                new ReviewEntity(2L, travelagencyEntity, userEntity, date, 4, "Wow2","Some review")
+        );
+
+        when(reviewRepository.findByUserWriter(userEntity)).thenReturn(reviewEntities);
+
+        // Act
+        List<Review> result = reviewService.getReviewsByUser(user);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Great experience", result.get(0).getDescription());
+        assertEquals("Some review", result.get(1).getDescription());
+        assertEquals("Wow", result.get(0).getTitle());
+        assertEquals("Wow2", result.get(1).getTitle());
+        assertEquals(user, result.get(0).getUserWriter());
+        assertEquals(user, result.get(1).getUserWriter());
+        assertEquals(travelagency, result.get(0).getTravelAgency());
+        assertEquals(travelagency, result.get(1).getTravelAgency());
+        assertEquals(4, result.get(0).getNumberOfStars());
+        assertEquals(4, result.get(1).getNumberOfStars());
     }
 
     @Test
-    void deleteReview_nonExistingReview(){
-        when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
+    void getReviewsByTravelAgency_shouldReturnReviewsForTravelAgency() {
+        // Arrange
+        Date date = new Date(2024, 9, 16);
 
-        assertThrows(NotFoundException.class, () -> reviewService.deleteReview(1L));
+        User user = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john@example.com", "johndoe", "hashedPassword", Gender.MALE);
+        UserEntity userEntity = UserConverter.convertToEntity(user);
+
+
+        User travelagency = new User(2L, "Global", "Trips", LocalDate.of(1990, 1, 1), "global@example.com", "globalTrips", "hashedPassword", Gender.MALE);
+        UserEntity travelagencyEntity = UserConverter.convertToEntity(travelagency);
+
+        List<ReviewEntity> reviewEntities = Arrays.asList(
+                new ReviewEntity(1L, travelagencyEntity, userEntity, date, 4, "Wow","Great experience" ),
+                new ReviewEntity(2L, travelagencyEntity, userEntity, date, 4, "Wow2","Excellent service")
+        );
+
+        when(reviewRepository.findByTravelAgency(travelagencyEntity)).thenReturn(reviewEntities);
+
+        // Act
+        List<Review> result = reviewService.getReviewsByTravelAgency(travelagency);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals("Great experience", result.get(0).getDescription());
+        assertEquals("Excellent service", result.get(1).getDescription());
+        assertEquals("Wow", result.get(0).getTitle());
+        assertEquals("Wow2", result.get(1).getTitle());
+        assertEquals(user, result.get(0).getUserWriter());
+        assertEquals(user, result.get(1).getUserWriter());
+        assertEquals(travelagency, result.get(0).getTravelAgency());
+        assertEquals(travelagency, result.get(1).getTravelAgency());
+        assertEquals(4, result.get(0).getNumberOfStars());
+        assertEquals(4, result.get(1).getNumberOfStars());
     }
-//    @Test
-//    void getReviewsByUser() {
-//    }
-//
-//    @Test
-//    void getReviewsByTravelAgency() {
-//    }
 }

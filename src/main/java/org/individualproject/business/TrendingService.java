@@ -63,14 +63,22 @@ public class TrendingService {
     }
     private boolean isAfterToday(Date date) {
         LocalDate today = LocalDate.now();
-        LocalDate dateToCheck = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Date utilDate = new Date(date.getTime());
+        LocalDate dateToCheck = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
         return dateToCheck.isAfter(today);
     }
 
     private boolean isBeforeSixMonthsFromToday(Date date) {
         LocalDate today = LocalDate.now();
         LocalDate sixMonthsFromToday = today.plusMonths(6);
-        LocalDate dateToCheck = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        // Convert java.sql.Date to java.util.Date
+        Date utilDate = new Date(date.getTime());
+
+        // Convert java.util.Date to LocalDate
+        LocalDate dateToCheck = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
         return dateToCheck.isBefore(sixMonthsFromToday);
     }
 }

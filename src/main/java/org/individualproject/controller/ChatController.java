@@ -6,12 +6,10 @@ import lombok.AllArgsConstructor;
 import org.individualproject.business.ChatService;
 import org.individualproject.business.UserService;
 import org.individualproject.domain.NotificationMessage;
-import org.individualproject.domain.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +40,6 @@ public class ChatController {
     }
 
     @GetMapping("/chat/{fromUserId}/{toUserId}/messages")
-    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<NotificationMessage>> getChatMessages(
             @PathVariable @NotNull Long fromUserId,
             @PathVariable @NotNull Long toUserId) {

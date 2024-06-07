@@ -1,6 +1,7 @@
 package org.individualproject.business;
 
 import lombok.AllArgsConstructor;
+import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.UsernameAlreadyExistsException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.configuration.security.token.AccessTokenEncoder;
@@ -24,6 +25,12 @@ public class RegisterService {
     private final AccessTokenEncoder accessTokenEncoder;
 
     public LoginRegisterResponse registerUser(RegisterRequest registerRequest){
+
+        if (registerRequest.getFirstName() == null || registerRequest.getLastName() == null || registerRequest.getUsername() == null ||
+                registerRequest.getEmail() == null || registerRequest.getBirthDate() == null || registerRequest.getPassword() == null ||
+                registerRequest.getGender() == null) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
 
         if(userRepository.existsByUsername(registerRequest.getUsername())){
             throw new UsernameAlreadyExistsException();
@@ -55,6 +62,12 @@ public class RegisterService {
     }
 
     public LoginRegisterResponse registerTravelingAgency(RegisterRequest registerRequest){
+
+        if (registerRequest.getFirstName() == null || registerRequest.getLastName() == null || registerRequest.getUsername() == null ||
+                registerRequest.getEmail() == null || registerRequest.getBirthDate() == null || registerRequest.getPassword() == null ||
+                registerRequest.getGender() == null) {
+            throw new InvalidExcursionDataException("Invalid input data");
+        }
 
         if(userRepository.existsByUsername(registerRequest.getUsername())){
             throw new UsernameAlreadyExistsException();
