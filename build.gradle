@@ -71,6 +71,7 @@ tasks.named('test') {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 tasks.named('sonar').configure {

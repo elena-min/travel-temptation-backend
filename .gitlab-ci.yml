@@ -32,7 +32,7 @@ sonarqube-check:
     key: "${CI_JOB_NAME}"
     paths:
       - .sonar/cache
-  script: ./gradlew build sonar
+  script: ./gradlew sonar
   allow_failure: true
   only:
     - merge_requests
