@@ -13,5 +13,9 @@ public interface ReviewRepository  extends JpaRepository<ReviewEntity, Long> {
 
     List<ReviewEntity> findByTravelAgency(UserEntity travelAgency);
 
+    void deleteByUserWriter(UserEntity userWriter);
+
+    void deleteByTravelAgency(UserEntity travelAgency);
+
 
 }

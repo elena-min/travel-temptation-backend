@@ -26,6 +26,11 @@ public class ExcursionEntity {
     @Column(name = "name")
     private String name;
 
+    @NotBlank
+    @Length(min = 2)
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "destinations")
     private String destinations;
 

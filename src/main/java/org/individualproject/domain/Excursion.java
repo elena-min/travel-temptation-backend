@@ -14,6 +14,7 @@ public class Excursion {
     private Long id;
     private String name;
     private List<String> destinations;
+    private String description;
     private Date startDate;
     private Date endDate;
     private User travelAgency;

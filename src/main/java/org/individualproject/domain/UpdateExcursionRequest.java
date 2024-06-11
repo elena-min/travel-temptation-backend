@@ -2,6 +2,7 @@ package org.individualproject.domain;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -10,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateExcursionRequest {
@@ -20,6 +22,9 @@ public class UpdateExcursionRequest {
 
     @NotEmpty(message = "Destinations list cannot be blank")
     private List<String> destinations;
+
+    @NotBlank(message = "Description name cannot be blank")
+    private String description;
 
     @NotNull(message = "Start date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

@@ -14,11 +14,11 @@ import org.individualproject.domain.enums.BookingStatus;
 import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
+import org.individualproject.persistence.PaymentDetailsRepository;
 import org.individualproject.persistence.entity.BookingEntity;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,6 +33,7 @@ public class BookingService {
     private static final String UNAUTHORIZED_ACCESS = "UNAUTHORIZED_ACCESS";
 
     private BookingRepository bookingRepository;
+    private PaymentDetailsRepository paymentDetailsRepository;
     private ExcursionRepository excursionRepository;
     private AccessToken requestAccessToken;
 
@@ -91,7 +92,6 @@ public class BookingService {
     }
 
     public boolean deleteBooking(Long id) {
-        try {
             Optional<BookingEntity> bookingEntity = bookingRepository.findById(id);
             if(bookingEntity.isPresent()){
 
@@ -110,6 +110,7 @@ public class BookingService {
                 if (timeDiff < twoWeeksInMillis) {
                     throw new IllegalStateException("Cannot cancel trip. Cancellation period has passed.");
                 } else {
+                    //paymentDetailsRepository.deleteById(booking.getBankingDetails().getId());
                     bookingRepository.deleteById(id);
                     return true;
                 }
@@ -117,10 +118,6 @@ public class BookingService {
             }else{
                 throw new NotFoundException("Booking not found.");
             }
-
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
     }
 
     public boolean updateBooking(UpdateBookingRequest updateBookingRequest) {
@@ -147,7 +144,7 @@ public class BookingService {
             bookingRepository.save(existingBooking);
             return true;
         } else {
-            return false;
+            throw new NotFoundException("Booking not found");
         }
     }
 

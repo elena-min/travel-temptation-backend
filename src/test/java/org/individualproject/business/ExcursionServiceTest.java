@@ -51,8 +51,8 @@ class ExcursionServiceTest {
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         List<ExcursionEntity> allExcursionEntities = Arrays.asList(
-                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
-                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+                ExcursionEntity.builder().id(1L).name("Excursion 1").description("description1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").description("description2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
         );
 
         List<Excursion> excursions = ExcursionConverter.mapToDomainList(allExcursionEntities);
@@ -93,6 +93,7 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
+                .description("Lovely trip through Rila")
                 .startDate(startDate)
                 .endDate(endDate)
                 .travelAgency(userEntity)
@@ -140,6 +141,7 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
+                .description("Lovely trip through Rila")
                 .startDate(startDate)
                 .endDate(endDate)
                 .travelAgency(userEntity)
@@ -151,6 +153,7 @@ class ExcursionServiceTest {
         CreateExcursionRequest createRequest = CreateExcursionRequest.builder()
                 .name("Mountain Hike")
                 .destinations(Arrays.asList("Paris", "London"))
+                .description("Lovely trip through Rila")
                 .startDate(startDate)
                 .endDate(endDate)
                 .travelAgency(user)
@@ -186,13 +189,14 @@ class ExcursionServiceTest {
         User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
 
         return Stream.of(
-                Arguments.of(new CreateExcursionRequest(null, Arrays.asList("Paris", "London"), startDate, endDate, validUser, 100.0, 50)), // Invalid name
-                Arguments.of(new CreateExcursionRequest("Excursion Name", null, startDate, endDate, validUser, 100.0, 50)), // Invalid destinations
-                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"), null, endDate, validUser, 100.0, 50)), // Invalid start date
-                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"), startDate, null, validUser, 100.0, 50)), // Invalid end date
-                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"), startDate, endDate, null, 100.0, 50)), // Invalid travel agency
-                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"), startDate, endDate, validUser, -1.0, 50)), // Invalid price
-                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"), startDate, endDate, validUser, 100.0, -1)) // Invalid number of available spaces
+                Arguments.of(new CreateExcursionRequest(null, Arrays.asList("Paris", "London"), "descrption", startDate, endDate, validUser, 100.0, 50)), // Invalid name
+                Arguments.of(new CreateExcursionRequest("Excursion Name", null,"descrption", startDate, endDate, validUser, 100.0, 50)), // Invalid destinations
+                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"),"descrption", null, endDate, validUser, 100.0, 50)), // Invalid start date
+                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"),"descrption", startDate, null, validUser, 100.0, 50)), // Invalid end date
+                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"),"descrption", startDate, endDate, null, 100.0, 50)), // Invalid travel agency
+                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"),"descrption", startDate, endDate, validUser, -1.0, 50)), // Invalid price
+                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"),"descrption", startDate, endDate, validUser, 100.0, -1)), // Invalid number of available spaces
+                Arguments.of(new CreateExcursionRequest("Excursion Name", Arrays.asList("Paris", "London"),null, startDate, endDate, validUser, 100.0, 50)) // Invalid description
         );
     }
     @Test
@@ -201,7 +205,7 @@ class ExcursionServiceTest {
         Date endDate = new Date();
         User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
 
-        CreateExcursionRequest createRequest = new CreateExcursionRequest("Mountain Hike", Arrays.asList("Paris", "London"), startDate, endDate, validUser, 1500.0, 58);
+        CreateExcursionRequest createRequest = new CreateExcursionRequest("Mountain Hike", Arrays.asList("Paris", "London"),"descrptiont", startDate, endDate, validUser, 1500.0, 58);
 
         when(accessToken.hasRole(UserRole.TRAVELAGENCY.name())).thenReturn(false);
 
@@ -222,6 +226,7 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
+                .description("description")
                 .startDate(startDate)
                 .endDate(endDate)
                 .travelAgency(userEntity)
@@ -234,9 +239,9 @@ class ExcursionServiceTest {
                 1L,
                 "Test Excursion",
                 Arrays.asList("Paris", "London"),
+                "description",
                 startDate,
                 endDate,
-
                 1000.0,
                 23
                 );
@@ -252,6 +257,7 @@ class ExcursionServiceTest {
         verify(excursionRepository).save(existingExcursionEntity);
         assertEquals("Test Excursion", existingExcursionEntity.getName());
         assertEquals("Paris,London", existingExcursionEntity.getDestinations());
+        assertEquals("description", existingExcursionEntity.getDescription());
         assertEquals(startDate, existingExcursionEntity.getStartDate());
         assertEquals(endDate, existingExcursionEntity.getEndDate());
         assertEquals(userEntity, existingExcursionEntity.getTravelAgency());
@@ -272,6 +278,7 @@ class ExcursionServiceTest {
                 1L,
                 "Test Excursion",
                 Arrays.asList("Paris", "London"),
+                "description",
                 startDate,
                 endDate,
                 1000.0,
@@ -300,6 +307,7 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name("Mountain Hike")
                 .destinations("Paris,London")
+                .description("description")
                 .startDate(startDate)
                 .endDate(endDate)
                 .travelAgency(UserConverter.convertToEntity(validUser))
@@ -312,6 +320,7 @@ class ExcursionServiceTest {
                 1L,
                 "Test Excursion",
                 Arrays.asList("Paris", "London"),
+                "description",
                 startDate,
                 endDate,
                 1000.0,
@@ -344,12 +353,14 @@ class ExcursionServiceTest {
         User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "JohdnDoe", "hashedPassword1", Gender.MALE);
 
         return Stream.of(
-                Arguments.of(new UpdateExcursionRequest(1L, null, Arrays.asList("Paris", "London"), startDate, endDate, 1000.0, 23)),
-                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", null, startDate, endDate, 1000.0, 23)),
-                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), null, endDate, 1000.0, 23)),
-                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), startDate, null, 1000.0, 23)),
-                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), startDate, endDate, -1.0, 23)),
-                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"), startDate, endDate, 1000.0, -1))
+                Arguments.of(new UpdateExcursionRequest(1L, null, Arrays.asList("Paris", "London"),"description", startDate, endDate, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", null, "description", startDate, endDate, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"),"description", null, endDate, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"),"description", startDate, null, 1000.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"),"description", startDate, endDate, -1.0, 23)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"),"description", startDate, endDate, 1000.0, -1)),
+                Arguments.of(new UpdateExcursionRequest(1L, "Test Excursion", Arrays.asList("Paris", "London"),null, startDate, endDate, 1000.0, 23))
+
         );
     }
 
@@ -442,6 +453,7 @@ class ExcursionServiceTest {
                 .id(1L)
                 .name(name)
                 .destinations("Mount Everest Base Camp, Annapurna Circuit")
+                .description("description")
                 .startDate(startDate)
                 .endDate(endDate)
                 .travelAgency(userEntity)
@@ -515,8 +527,8 @@ class ExcursionServiceTest {
 
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
         List<ExcursionEntity> excursionEntities = Arrays.asList(
-                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
-                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
         );
         when(excursionRepository.findByTravelAgency(userEntity)).thenReturn(excursionEntities);
 
@@ -554,8 +566,8 @@ class ExcursionServiceTest {
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         List<ExcursionEntity> mockExcursionEntities = Arrays.asList(
-                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
-                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(100.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(200.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
         );
         when(excursionRepository.findByNameContainingIgnoreCaseOrTravelAgency_FirstNameContainingIgnoreCaseOrTravelAgency_LastNameContainingIgnoreCase(
                 searchTerm, searchTerm, searchTerm)).thenReturn(mockExcursionEntities);
@@ -579,8 +591,8 @@ class ExcursionServiceTest {
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         List<ExcursionEntity> mockExcursions = Arrays.asList(
-                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
-                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
         );
         when(excursionRepository.findByPriceBetween(minPrice, maxPrice)).thenReturn(mockExcursions);
 
@@ -598,8 +610,8 @@ class ExcursionServiceTest {
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         List<ExcursionEntity> mockExcursions = Arrays.asList(
-                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
-                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
         );
         when(excursionRepository.findAll()).thenReturn(mockExcursions);
 
@@ -620,8 +632,8 @@ class ExcursionServiceTest {
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         List<ExcursionEntity> mockExcursions = Arrays.asList(
-                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
-                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
+                ExcursionEntity.builder().id(1L).name("Excursion 1").destinations("Paris,London").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(125.0).numberOfAvaliableSpaces(50).numberOfSpacesLeft(50).build(),
+                ExcursionEntity.builder().id(2L).name("Excursion 2").destinations("New York,Boston").description("description").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(247.0).numberOfAvaliableSpaces(40).numberOfSpacesLeft(40).build()
         );
         when(excursionRepository.findByNameContainingIgnoreCaseAndPriceBetweenOrTravelAgency_FirstNameContainingIgnoreCaseAndPriceBetweenOrTravelAgency_LastNameContainingIgnoreCaseAndPriceBetween(
                 searchTerm, minPrice, maxPrice,

@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.ReviewService;
 import org.individualproject.business.UserService;
+import org.individualproject.business.exception.NotFoundException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,10 +51,16 @@ public class ReviewController {
     @RolesAllowed({"USER", "ADMIN"})
     public ResponseEntity<Long> deleteReview(@PathVariable(value = "id")@NotNull final Long id)
     {
-        if (reviewService.deleteReview(id)) {
+        try {
+            reviewService.deleteReview(id);
             return ResponseEntity.ok().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (UnauthorizedDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/user/{userId}")

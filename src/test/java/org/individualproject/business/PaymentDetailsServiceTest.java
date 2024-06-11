@@ -1,19 +1,14 @@
 package org.individualproject.business;
 
-import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
-import org.individualproject.domain.enums.BookingStatus;
 import org.individualproject.domain.enums.Gender;
 import org.individualproject.domain.enums.UserRole;
-import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.PaymentDetailsRepository;
-import org.individualproject.persistence.entity.BookingEntity;
-import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Test;
@@ -23,12 +18,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -50,7 +43,7 @@ class PaymentDetailsServiceTest {
     void getAllPaymentDetails_returnsAllPaymentDetails() {
         // Arrange
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         List<PaymentDetailsEntity> allPaymentDetailsEntities = Arrays.asList(
@@ -85,7 +78,7 @@ class PaymentDetailsServiceTest {
     @Test
     void getPaymentDetails_shouldReturnPaymentDetails() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
 
         PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsEntity.builder()
@@ -140,7 +133,7 @@ class PaymentDetailsServiceTest {
     @Test
     void createPaymentDetails_shouldSavePaymentDetails() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         User user = UserConverter.mapToDomain(userEntity);
@@ -179,14 +172,16 @@ class PaymentDetailsServiceTest {
     }
 
     private static Stream<Arguments> provideStringsForIsParams() {
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
         User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "johnDoe","hashedPassword1", Gender.MALE);
 
         return Stream.of(
                 Arguments.of(new CreatePaymentDetailsRequest(null, "1234567890123456", "234", expDate, "Nick Jonas")),
                 Arguments.of(new CreatePaymentDetailsRequest(validUser, null, "234", expDate, "Nick Jonas")),
                 Arguments.of(new CreatePaymentDetailsRequest(validUser, "1234567890123456", "232344", null, "Nick Jonas")),
-                Arguments.of(new CreatePaymentDetailsRequest(validUser, "1234567890123456", "234", expDate, null))
+                Arguments.of(new CreatePaymentDetailsRequest(validUser, "1234567890123456", "234", expDate, null)),
+                Arguments.of(new CreatePaymentDetailsRequest(validUser, "1234567890123456", null, expDate, "Nick Jonas"))
+
         );
     }
 
@@ -255,7 +250,7 @@ class PaymentDetailsServiceTest {
     @Test
     void updatePaymentDetails_ShouldReturnTrue_WhenPaymentDetailsExist() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         User user = UserConverter.mapToDomain(userEntity);
@@ -288,7 +283,7 @@ class PaymentDetailsServiceTest {
     @Test
     void updatePaymentDetails_shouldReturnFalseWhenDetailsDoNotExist(){
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         User user = UserConverter.mapToDomain(userEntity);
@@ -327,7 +322,7 @@ class PaymentDetailsServiceTest {
 
     private static Stream<Arguments> provideInvalidUpdatePaymentDetailsRequests() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         User user = UserConverter.mapToDomain(fakeUserEntity);
@@ -344,7 +339,7 @@ class PaymentDetailsServiceTest {
     @Test
     void updatePaymentDetails_shouldThrowUnauthorizedAccessExceptionForInvalidUser() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         User user = UserConverter.mapToDomain(userEntity);

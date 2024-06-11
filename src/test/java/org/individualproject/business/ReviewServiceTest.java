@@ -211,11 +211,10 @@ class ReviewServiceTest {
         Long id = 1L;
         when(reviewRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act & Assert
-        boolean result = reviewService.deleteReview(id);
-
-        // Assert
-        assertFalse(result);
+        assertThrows(NotFoundException.class, () -> {
+            // Act
+            reviewService.deleteReview(id);
+        });
         verify(reviewRepository, never()).deleteById(id);
     }
     @Test

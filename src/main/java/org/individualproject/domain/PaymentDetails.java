@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +16,6 @@ public class PaymentDetails {
     private User user;
     private String cardNumber;
     private String cvv;
-    private LocalDate expirationDate;
+    private YearMonth expirationDate;
     private String cardHolderName;
 }

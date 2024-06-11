@@ -21,6 +21,9 @@ public class CreateExcursionRequest {
     @NotEmpty(message = "Destinations list cannot be blank")
     private List<String> destinations;
 
+    @NotBlank(message = "Description name cannot be blank")
+    private String description;
+
     @NotNull(message = "Start date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Future(message = "Start date must be in the future")

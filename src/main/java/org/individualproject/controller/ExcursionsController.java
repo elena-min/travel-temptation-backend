@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
+import org.individualproject.business.exception.NotFoundException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.domain.CreateExcursionRequest;
 import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.lang.Long;
 
 @RestController
 @RequestMapping("/excursions")
@@ -64,9 +65,21 @@ public class ExcursionsController {
     @RolesAllowed({"TRAVELAGENCY", "ADMIN"})
     public ResponseEntity<Void> updateExcursion(@PathVariable(value = "id")@NotNull final long id, @RequestBody @Valid UpdateExcursionRequest request){
 
-        request.setId(id);
-        excursionService.updateExcursion(request);
-        return ResponseEntity.noContent().build();
+        try {
+            request.setId(id);
+            boolean updated = excursionService.updateExcursion(request);
+            if (updated) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        }catch (UnauthorizedDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/name/{name}")
@@ -83,8 +96,8 @@ public class ExcursionsController {
     public ResponseEntity<List<Excursion>> getExcursionsByTravelAgency(@PathVariable(value = "travelAgencyID")@NotNull Long travelAgency)
     {
         Optional<User> userOptional = userService.getUser(travelAgency);
-        if(userOptional == null){
-            return  ResponseEntity.notFound().build();
+        if (!userOptional.isPresent()) {
+            throw new NotFoundException("Travel agency not found with ID: " + travelAgency);
         }
         User user = userOptional.get();
         List<Excursion> excursions = excursionService.getExcursionsByTravelAgency(user);

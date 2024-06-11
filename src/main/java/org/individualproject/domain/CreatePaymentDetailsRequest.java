@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Data
 @NoArgsConstructor
@@ -25,7 +25,7 @@ public class CreatePaymentDetailsRequest {
     private String cvv;
 
     @NotNull(message = "Expiration date cannot be null")
-    private LocalDate expirationDate;
+    private YearMonth expirationDate;
 
     @NotBlank(message = "Card Holder cannot be blank")
     private String cardHolderName;

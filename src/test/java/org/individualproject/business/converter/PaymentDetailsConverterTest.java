@@ -10,6 +10,7 @@ import org.individualproject.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,7 +23,7 @@ class PaymentDetailsConverterTest {
     @Test
     void mapToDomain() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-
+        YearMonth expDate = YearMonth.of(2027, 9);
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
                 .firstName("Nick")
@@ -39,7 +40,7 @@ class PaymentDetailsConverterTest {
                 .cvv("234")
                 .cardHolderName("Nick Jonas")
                 .cardNumber("1234567890123456")
-                .expirationDate(date)
+                .expirationDate(expDate)
                 .build();
 
         PaymentDetails paymentDetails = PaymentDetailsConverter.mapToDomain(paymentDetailsEntity);
@@ -57,7 +58,7 @@ class PaymentDetailsConverterTest {
     @Test
     void mapToDomainList() {
         LocalDate date = LocalDate.of(2014, 9, 16);
-
+        YearMonth expDate = YearMonth.of(2027, 9);
         UserEntity userEntity = UserEntity.builder()
                 .id(1L)
                 .firstName("Nick")
@@ -76,7 +77,7 @@ class PaymentDetailsConverterTest {
                 .cvv("234")
                 .cardHolderName("Nick Jonas")
                 .cardNumber("1234567890123456")
-                .expirationDate(date)
+                .expirationDate(expDate)
                 .build();
 
         PaymentDetailsEntity paymentDetailsEntity2 = PaymentDetailsEntity.builder()
@@ -85,7 +86,7 @@ class PaymentDetailsConverterTest {
                 .cvv("986")
                 .cardHolderName("Joe Jonas")
                 .cardNumber("1234567890198456")
-                .expirationDate(date)
+                .expirationDate(expDate)
                 .build();
 
         paymentDetailsEntityListEntityList.add(paymentDetailsEntity1);
@@ -115,7 +116,7 @@ class PaymentDetailsConverterTest {
     @Test
     void convertToEntity(){
         LocalDate date = LocalDate.of(2014, 9, 16);
-
+        YearMonth expDate = YearMonth.of(2027, 9);
         User user = User.builder()
                 .id(1L)
                 .firstName("Nick")
@@ -132,7 +133,7 @@ class PaymentDetailsConverterTest {
                 .cvv("234")
                 .cardHolderName("Nick Jonas")
                 .cardNumber("1234567890123456")
-                .expirationDate(date)
+                .expirationDate(expDate)
                 .build();
 
         PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsConverter.convertToEntity(paymentDetails);

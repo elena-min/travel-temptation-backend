@@ -2,10 +2,11 @@ package org.individualproject.business;
 
 import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
-import org.individualproject.persistence.UserRepository;
+import org.individualproject.persistence.*;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ import java.util.Optional;
 public class UserService {
 
     private UserRepository userRepository;
+    private ReviewRepository reviewRepository;
+    private BookingRepository bookingRepository;
+    private PaymentDetailsRepository paymentDetailsRepository;
+    private ExcursionRepository excursionRepository;
     private AccessToken requestAccessToken;
    public List<User> getUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
@@ -27,7 +32,11 @@ public class UserService {
     }
     public Optional<User> getUser(Long id) {
         Optional<UserEntity> userEntity = userRepository.findById(id);
-        return userEntity.map(UserConverter::mapToDomain);
+        if (userEntity.isPresent()) {
+            return Optional.of(UserConverter.mapToDomain(userEntity.get()));
+        } else {
+            throw new NotFoundException("User not found");
+        }
     }
 
     public Optional<User> getUserByUsername(String username) {
@@ -59,8 +68,20 @@ public class UserService {
             if (!Objects.equals(requestAccessToken.getUserID(), id)) {
                 throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
             }
-            userRepository.deleteById(id);
-            return true;
+            Optional<UserEntity> user = userRepository.findById(id);
+
+            if(user.isPresent()){
+                UserEntity userEntity = user.get();
+                reviewRepository.deleteByUserWriter(userEntity);
+                reviewRepository.deleteByTravelAgency(userEntity);
+                bookingRepository.deleteByUser(userEntity);
+                paymentDetailsRepository.deleteByUser(userEntity);
+                excursionRepository.deleteByTravelAgency(userEntity);
+
+                userRepository.deleteById(id);
+                return true;
+            }
+            return false;
         } catch (EmptyResultDataAccessException e) {
             return false;
         }

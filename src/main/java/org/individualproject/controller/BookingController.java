@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.individualproject.business.BookingService;
 import org.individualproject.business.ExcursionService;
 import org.individualproject.business.UserService;
+import org.individualproject.business.exception.InvalidExcursionDataException;
+import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.domain.*;
 import org.individualproject.domain.enums.BookingStatus;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -49,18 +51,33 @@ public class BookingController {
     @PostMapping()
     @RolesAllowed({"USER"})
     public ResponseEntity<Booking> createBooking(@RequestBody @Valid CreateBookingRequest request) {
-        Booking response = bookingService.createBooking(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        try {
+            Booking response = bookingService.createBooking(request);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (InvalidExcursionDataException | IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred while creating the booking.", e);
+        }
     }
 
     @DeleteMapping("/{id}")
     @RolesAllowed({"USER", "TRAVELAGENCY"})
-    public ResponseEntity<Long> deleteBooking(@PathVariable(value = "id") final Long id)
+    public ResponseEntity<String> deleteBooking(@PathVariable(value = "id") final Long id)
     {
-        if (bookingService.deleteBooking(id)) {
-            return ResponseEntity.ok().build();
+        try {
+            if (bookingService.deleteBooking(id)) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Booking not found.");
+            }
+        } catch (UnauthorizedDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
-        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")

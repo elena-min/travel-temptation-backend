@@ -45,8 +45,8 @@ class TrendingServiceTest {
         //UserEntity user = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").username("JohnyDOe").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         UserEntity travelAgency = UserEntity.builder().id(1L).firstName("Travel").lastName("Global").birthDate(date).email("travel@example.com").username("traveling").hashedPassword("hashedPassword2").gender(Gender.OTHER).build();
         List<ExcursionEntity> excursionEntities = Arrays.asList(
-                new ExcursionEntity(1L, "Excursion 1", "Paris, Bora Bora", startDate, endDate, travelAgency, 100.0, 50, 50),
-                new ExcursionEntity(2L, "Excursion 2", "London, Amsterdam", startDate, endDate, travelAgency, 200.0, 40, 40)
+                new ExcursionEntity(1L, "Excursion 1", "Paris, Bora Bora","description", startDate, endDate, travelAgency, 100.0, 50, 50),
+                new ExcursionEntity(2L, "Excursion 2", "London, Amsterdam","description", startDate, endDate, travelAgency, 200.0, 40, 40)
         );
         when(excursionRepository.findAll()).thenReturn(excursionEntities);
 

@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Stream;
@@ -60,10 +61,10 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         List<BookingEntity> allBookingEntitities = Arrays.asList(
@@ -98,10 +99,10 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         BookingEntity bookingEntity = BookingEntity.builder().id(1L).bookingTime(LocalDateTime.now()).excursion(fakeExcursionEntity).status(BookingStatus.PENDING).numberOfTravelers(4).bankingDetails(fakePaymentDetailsEntity).user(fakeUserEntity).build();
@@ -156,10 +157,10 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         BookingEntity bookingEntity = BookingEntity.builder().id(1L).bookingTime(LocalDateTime.now()).excursion(fakeExcursionEntity).status(BookingStatus.PENDING).numberOfTravelers(4).bankingDetails(fakePaymentDetailsEntity).user(fakeUserEntity).build();
@@ -198,10 +199,10 @@ class BookingServiceTest {
     private static Stream<Arguments> provideStringsForIsParams() {
         Date startDate = new Date();
         Date endDate = new Date();
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         User validUser = new User(1L, "John", "Doe", LocalDate.of(1990, 1, 1), "john.doe@example.com", "johnDoe", "hashedPassword1", Gender.MALE);
-        Excursion excursion = Excursion.builder().id(1L).name("Mountain Hike").destinations(Arrays.asList("Paris", "London")).startDate(startDate).endDate(endDate).travelAgency(validUser).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        Excursion excursion = Excursion.builder().id(1L).name("Mountain Hike").description("description").destinations(Arrays.asList("Paris", "London")).startDate(startDate).endDate(endDate).travelAgency(validUser).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetails paymentDetails = PaymentDetails.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(validUser).build();
 
         return Stream.of(
@@ -216,12 +217,13 @@ class BookingServiceTest {
     @Test
     void deleteBooking_shouldDeleteExistingBooking() {
         // Arrange
+        YearMonth expDate = YearMonth.of(2027, 9);
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         LocalDateTime bookingTime = LocalDateTime.of(2024, 6, 1, 10, 0);
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(startDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
-        PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(date).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).description("description").name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(startDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         BookingEntity bookingEntity = BookingEntity.builder().id(1L).bookingTime(bookingTime).excursion(fakeExcursionEntity).status(BookingStatus.PENDING).numberOfTravelers(4).bankingDetails(fakePaymentDetailsEntity).user(fakeUserEntity).build();
 
@@ -241,14 +243,15 @@ class BookingServiceTest {
     void deleteBooking_shouldThrowExceptionForPassedCancelationPeriod() {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date currentDate = new Date();
+        YearMonth expDate = YearMonth.of(2027, 9);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(currentDate);
         calendar.add(Calendar.DATE, 12);
         Date startDate = calendar.getTime();
         LocalDateTime bookingTime = LocalDateTime.of(2024, 6, 1, 10, 0);
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(startDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
-        PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(date).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(startDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         BookingEntity bookingEntity = BookingEntity.builder().id(1L).bookingTime(bookingTime).excursion(fakeExcursionEntity).status(BookingStatus.PENDING).numberOfTravelers(4).bankingDetails(fakePaymentDetailsEntity).user(fakeUserEntity).build();
 
@@ -292,10 +295,10 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         BookingEntity bookingEntity = BookingEntity.builder().id(1L).bookingTime(LocalDateTime.now()).excursion(fakeExcursionEntity).status(BookingStatus.PENDING).numberOfTravelers(4).bankingDetails(fakePaymentDetailsEntity).user(fakeUserEntity).build();
@@ -342,11 +345,11 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         LocalDateTime bookingTime = LocalDateTime.now();
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         User user = UserConverter.mapToDomain(fakeUserEntity);
@@ -370,10 +373,10 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         User user = UserConverter.mapToDomain(fakeUserEntity);
@@ -394,10 +397,10 @@ class BookingServiceTest {
         when(bookingRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act
-        boolean updateResult = bookingService.updateBooking(updateBookingRequest);
-
-        // Assert
-        assertFalse(updateResult);
+        assertThrows(NotFoundException.class, () -> {
+            // Act
+            bookingService.updateBooking(updateBookingRequest);
+        });
         verify(bookingRepository, never()).save(any());
     }
 
@@ -407,10 +410,10 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         UserEntity fakeUserEntity = UserEntity.builder().id(1L).firstName("John").lastName("Doe").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(fakeUserEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(fakeUserEntity).build();
 
         BookingEntity bookingEntity = BookingEntity.builder().id(1L).bookingTime(LocalDateTime.now()).excursion(fakeExcursionEntity).status(BookingStatus.PENDING).numberOfTravelers(4).bankingDetails(fakePaymentDetailsEntity).user(fakeUserEntity).build();
@@ -441,11 +444,11 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         User travelAgency = User.builder().id(1L).firstName("Travel").lastName("Agency").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(userEntity).build();
 
         //User travelAgency = new User(1L, "Travel Agency", "Agency", null, null, null, null);
@@ -670,11 +673,11 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         Date startDate = new Date(2028, 9, 16);
         Date endDate = new Date(2028, 9, 24);
-        LocalDate expDate = LocalDate.of(2027, 9, 16);
+        YearMonth expDate = YearMonth.of(2027, 9);
 
         User travelAgency = User.builder().id(1L).firstName("Travel").lastName("Agency").birthDate(date).email("j.doe@example.com").hashedPassword("hashedPassword1").gender(Gender.MALE).build();
         UserEntity userEntity = UserConverter.convertToEntity(travelAgency);
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
         PaymentDetailsEntity fakePaymentDetailsEntity = PaymentDetailsEntity.builder().id(1L).expirationDate(expDate).cvv("123").cardNumber("1234567890123456").cardHolderName("Nick Jonas").user(userEntity).build();
 
         Excursion excursion = ExcursionConverter.mapToDomain(fakeExcursionEntity);
@@ -702,7 +705,7 @@ class BookingServiceTest {
         LocalDate date = LocalDate.of(2014, 9, 16);
         User nonExistingUser = User.builder().id(100L).firstName("Non").lastName("Existing").birthDate(date).email("nonexisting@example.com").hashedPassword("nonExistingPwd").gender(Gender.MALE).build();
         UserEntity userEntity = UserConverter.convertToEntity(nonExistingUser);
-        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
+        ExcursionEntity fakeExcursionEntity = ExcursionEntity.builder().id(1L).name("Mountain Hike").description("description").destinations("Mount Everest Base Camp, Annapurna Circuit").startDate(startDate).endDate(endDate).travelAgency(userEntity).price(1500.0).numberOfAvaliableSpaces(58).numberOfSpacesLeft(58).build();
 
         Excursion excursion = ExcursionConverter.mapToDomain(fakeExcursionEntity);
 

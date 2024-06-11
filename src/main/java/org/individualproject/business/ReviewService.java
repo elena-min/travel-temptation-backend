@@ -3,6 +3,7 @@ package org.individualproject.business;
 import lombok.AllArgsConstructor;
 import org.individualproject.business.converter.*;
 import org.individualproject.business.exception.InvalidExcursionDataException;
+import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
@@ -56,20 +57,17 @@ public class ReviewService {
     public boolean deleteReview(Long id) {
 
         Optional<ReviewEntity> reviewEntityOptional = reviewRepository.findById(id);
-        if(reviewEntityOptional.isPresent()){
-
-            ReviewEntity reviewEntity = reviewEntityOptional.get();
-
-                if (!accessToken.getUserID().equals(reviewEntity.getUserWriter().getId())) {
-                    throw new UnauthorizedDataAccessException("UNAUTHORIZED_ACCESS");
-                }
-
-            reviewRepository.deleteById(id);
-            return true;
-
-        }else{
-            return false;
+        if (!reviewEntityOptional.isPresent()) {
+            throw new NotFoundException("Review not found");
         }
+
+        ReviewEntity reviewEntity = reviewEntityOptional.get();
+        if (!accessToken.getUserID().equals(reviewEntity.getUserWriter().getId())) {
+            throw new UnauthorizedDataAccessException("Unauthorized access");
+        }
+
+        reviewRepository.deleteById(id);
+        return true;
     }
 
     public List<Review> getReviewsByUser(User user) {

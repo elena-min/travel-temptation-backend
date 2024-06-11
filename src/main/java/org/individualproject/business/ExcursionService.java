@@ -11,6 +11,7 @@ import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateExcursionRequest;
 import org.individualproject.domain.User;
 import org.individualproject.domain.enums.UserRole;
+import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
@@ -23,6 +24,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ExcursionService {
     private ExcursionRepository excursionRepository;
+    private BookingRepository bookingRepository;
     private AccessToken requestAccessToken;
     public List<Excursion> getExcursions() {
         List<ExcursionEntity> excursionEntities = excursionRepository.findAll();
@@ -34,7 +36,7 @@ public class ExcursionService {
     }
 
     public Excursion createExcursion(CreateExcursionRequest request){
-        if (request.getName() == null || request.getDestinations() == null || request.getStartDate() == null ||
+        if (request.getName() == null || request.getDestinations() == null || request.getDescription() == null || request.getStartDate() == null ||
                 request.getEndDate() == null || request.getTravelAgency() == null || request.getPrice() < 0 ||
                 request.getNumberOfAvaliableSpaces() < 0) {
             throw new InvalidExcursionDataException("Invalid input data");
@@ -48,6 +50,7 @@ public class ExcursionService {
         ExcursionEntity newExcursion = ExcursionEntity.builder()
                 .name(request.getName())
                 .destinations(String.join(",", request.getDestinations()))
+                .description(request.getDescription())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
                 .travelAgency(userEntity)
@@ -73,6 +76,7 @@ public class ExcursionService {
                 throw new UnauthorizedDataAccessException("EXCURSION_NOT_OWNED_BY_LOGGED_IN_USER");
             }
 
+            bookingRepository.deleteByExcursion(excursion);
             excursionRepository.deleteById(id);
             return true;
         } else {
@@ -83,7 +87,7 @@ public class ExcursionService {
     public boolean updateExcursion(UpdateExcursionRequest request) {
         Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(request.getId());
 
-        if (request.getName() == null || request.getDestinations() == null || request.getStartDate() == null ||
+        if (request.getName() == null || request.getDestinations() == null || request.getDescription() == null  || request.getStartDate() == null ||
                 request.getEndDate() == null || request.getPrice() < 0 ||
                 request.getNumberOfAvaliableSpaces() < 0) {
             throw new InvalidExcursionDataException("Invalid input data");
@@ -103,6 +107,7 @@ public class ExcursionService {
             List<String> destinations = request.getDestinations();
             String destinationsString = String.join(",", destinations);
             existingExcursion.setDestinations(destinationsString);
+            existingExcursion.setDescription(request.getDescription());
             existingExcursion.setStartDate(request.getStartDate());
             existingExcursion.setEndDate(request.getEndDate());
             existingExcursion.setPrice(request.getPrice());

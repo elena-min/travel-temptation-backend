@@ -5,6 +5,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.UserService;
+import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,17 +26,29 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable(value = "id")@NotNull final Long id)
     {
-        final Optional<User> userOptional = userService.getUser(id);
-        return userOptional.map(user -> ResponseEntity.ok().body(user))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            final Optional<User> userOptional = userService.getUser(id);
+            return userOptional.map(user -> ResponseEntity.ok().body(user))
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        } catch (NotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable(value = "username")@NotNull final String username)
     {
-        final Optional<User> userOptional = userService.getUserByUsername(username);
-        return userOptional.map(user -> ResponseEntity.ok().body(user))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            final Optional<User> userOptional = userService.getUserByUsername(username);
+            return userOptional.map(user -> ResponseEntity.ok().body(user))
+                    .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        } catch (NotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
     @GetMapping()
     public ResponseEntity<List<User>> getUsers()
@@ -61,7 +74,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @RolesAllowed({"USER"})
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Void> updateUser(@PathVariable(value = "id")@NotNull final long id, @RequestBody @Valid UpdateUserRequest request){
 
         request.setId(id);

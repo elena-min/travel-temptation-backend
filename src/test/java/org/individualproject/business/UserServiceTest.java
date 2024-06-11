@@ -2,6 +2,7 @@ package org.individualproject.business;
 
 import org.individualproject.business.converter.ExcursionConverter;
 import org.individualproject.business.converter.UserConverter;
+import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.CreateUserRequest;
@@ -9,8 +10,7 @@ import org.individualproject.domain.Excursion;
 import org.individualproject.domain.UpdateUserRequest;
 import org.individualproject.domain.User;
 import org.individualproject.domain.enums.Gender;
-import org.individualproject.persistence.BookingRepository;
-import org.individualproject.persistence.UserRepository;
+import org.individualproject.persistence.*;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Test;
@@ -34,6 +34,19 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
+
+
+    @Mock
+    private BookingRepository bookingRepository;
+
+    @Mock
+    private ExcursionRepository excursionRepository;
+
+    @Mock
+    private PaymentDetailsRepository paymentDetailsRepository;
 
     @Mock
     private AccessToken accessToken;
@@ -94,14 +107,15 @@ class UserServiceTest {
     @Test
     void getUser_userNotFound() {
         //Arrange
-        Long id = 9923L;
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        Long id = 9923L; // Ensure the id matches everywhere
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act
-        Optional<User> actual = userService.getUser(1L);
         // Assert
-        assertFalse(actual.isPresent());
-        verify(userRepository, times(1)).findById(1L);
+        assertThrows(NotFoundException.class, () -> {
+            // Act
+            userService.getUser(id);
+        });
+        verify(userRepository, times(1)).findById(id);
     }
 
     @Test
@@ -199,34 +213,42 @@ class UserServiceTest {
                 Gender.MALE
         );
         UserEntity userEntity = UserEntity.builder().id(1L).firstName("Nick").lastName("JOnas").birthDate(date).username("nickJonas").email("nickJ@gmail.com").hashedPassword("hash").gender(Gender.MALE).build();
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
-
-        User actual = userService.createUser(userRequest);
-        Long userId = 1L;
         when(accessToken.getUserID()).thenReturn(1L);
-        Mockito.doNothing().when(userRepository).deleteById(userId);
+
+        // Mocking Repository Methods
+        when(userRepository.findById(id)).thenReturn(Optional.of(userEntity));
+        doNothing().when(reviewRepository).deleteByUserWriter(userEntity);
+        doNothing().when(reviewRepository).deleteByTravelAgency(userEntity);
+        doNothing().when(bookingRepository).deleteByUser(userEntity);
+        doNothing().when(paymentDetailsRepository).deleteByUser(userEntity);
+        doNothing().when(excursionRepository).deleteByTravelAgency(userEntity);
+        doNothing().when(userRepository).deleteById(id); // This is already mocked
 
         // Act
-        boolean result = userService.deleteUser(userId);
+        boolean result = userService.deleteUser(id);
 
         // Assert
         assertTrue(result);
-        verify(userRepository, times(1)).deleteById(userId);
-
+        verify(userRepository, times(1)).deleteById(id);
+        verify(reviewRepository, times(1)).deleteByUserWriter(userEntity);
+        verify(reviewRepository, times(1)).deleteByTravelAgency(userEntity);
+        verify(bookingRepository, times(1)).deleteByUser(userEntity);
+        verify(paymentDetailsRepository, times(1)).deleteByUser(userEntity);
+        verify(excursionRepository, times(1)).deleteByTravelAgency(userEntity);
     }
     @Test
     void deleteUser_nonExistingUser(){
         Long nonExistingUserId = 1L;
         when(accessToken.getUserID()).thenReturn(1L);
 
-        doThrow(EmptyResultDataAccessException.class).when(userRepository).deleteById(nonExistingUserId);
+//        doThrow(EmptyResultDataAccessException.class).when(userRepository).deleteById(nonExistingUserId);
 
         // Act
         boolean result = userService.deleteUser(nonExistingUserId);
 
         // Assert
         assertFalse(result);
-        verify(userRepository, times(1)).deleteById(nonExistingUserId);
+        verify(userRepository, times(0)).deleteById(nonExistingUserId);
     }
 
     @Test

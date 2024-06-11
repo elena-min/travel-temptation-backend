@@ -18,6 +18,9 @@ import java.util.List;
 @Repository
 public interface BookingRepository  extends JpaRepository<BookingEntity, Long> {
     List<BookingEntity> findByUser(UserEntity user);
+    void deleteByUser(UserEntity user);
+    void deleteByExcursion(ExcursionEntity excursion);
+
 
     @Query("SELECT b FROM BookingEntity b WHERE b.user = :user AND (b.excursion.startDate < :currentDate OR b.excursion.startDate = :currentDate)")
     List<BookingEntity> findByUserAndExcursion_StartDateBeforeOrExcursion_StartDateEquals(UserEntity user, Date currentDate);

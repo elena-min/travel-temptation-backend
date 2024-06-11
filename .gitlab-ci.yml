@@ -9,6 +9,7 @@ variables:
 stages:
   - build
   - test
+  - integration_test
   - sonarqube-check
 
 build:

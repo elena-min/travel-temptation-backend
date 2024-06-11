@@ -16,6 +16,7 @@ import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.YearMonth;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,6 +49,7 @@ class BookingConverterTest {
                 .id(1L)
                 .name("City Tour")
                 .destinations("Rome.Florance")
+                .description("description")
                 .startDate(new Date(124, 4, 16))
                 .endDate(new Date(124, 4, 26))
                 .travelAgency(userEntity)
@@ -62,7 +64,7 @@ class BookingConverterTest {
                 .cvv("123")
                 .cardHolderName("Nick Jonas")
                 .cardNumber("2345")
-                .expirationDate(LocalDate.EPOCH)
+                .expirationDate(YearMonth.of(2027, 9))
                 .build();
         PaymentDetails paymentDetails = PaymentDetailsConverter.mapToDomain(paymentDetailsEntity);
         when(bookingEntity.getBankingDetails()).thenReturn(paymentDetailsEntity);
@@ -108,6 +110,7 @@ class BookingConverterTest {
                 .id(1L)
                 .name("City Tour")
                 .destinations("Rome.Florance")
+                .description("description")
                 .startDate(new Date(124, 4, 16))
                 .endDate(new Date(124, 4, 26))
                 .travelAgency(userEntity)
@@ -122,7 +125,7 @@ class BookingConverterTest {
                 .cvv("123")
                 .cardHolderName("Nick Jonas")
                 .cardNumber("2345")
-                .expirationDate(LocalDate.EPOCH)
+                .expirationDate(YearMonth.of(2027, 9))
                 .build();
         PaymentDetails paymentDetails = PaymentDetailsConverter.mapToDomain(paymentDetailsEntity);
         when(bookingEntity.getBankingDetails()).thenReturn(paymentDetailsEntity);
@@ -166,7 +169,7 @@ class BookingConverterTest {
                 .cvv("234")
                 .cardHolderName("Nick Jonas")
                 .cardNumber("1234567890123456")
-                .expirationDate(date)
+                .expirationDate(YearMonth.of(2027, 9))
                 .build();
 
         List<String> destinations = new ArrayList<>();
@@ -176,6 +179,7 @@ class BookingConverterTest {
                 .id(1L)
                 .name("City Tour")
                 .destinations(destinations)
+                .description("description")
                 .startDate(new Date(124, 4, 16))
                 .endDate(new Date(124, 4, 26))
                 .travelAgency(user)

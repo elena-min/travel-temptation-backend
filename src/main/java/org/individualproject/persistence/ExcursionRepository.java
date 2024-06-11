@@ -30,4 +30,5 @@ public interface ExcursionRepository extends JpaRepository<ExcursionEntity, Long
 
     List<ExcursionEntity> findByTravelAgency(UserEntity travelAgency);
 
+    void deleteByTravelAgency(UserEntity travelAgency);
 }

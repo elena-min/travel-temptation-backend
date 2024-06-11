@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Entity
 @Data
@@ -35,7 +35,7 @@ public class PaymentDetailsEntity {
 
     @Column(name = "expirationDate")
     @NotNull
-    private LocalDate expirationDate;
+    private YearMonth expirationDate;
 
     @Column(name = "cardHolderName")
     @NotNull
