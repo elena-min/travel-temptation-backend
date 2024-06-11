@@ -74,7 +74,7 @@ test {
 }
 
 tasks.named('sonar').configure {
-    dependsOn test
+    dependsOn compileJava, test
 }
 
 sourceSets {
