@@ -23,8 +23,6 @@ test:
   stage: test
   script:
     - ./gradlew test
-  only:
-    - main
 
 sonarqube-check:
   stage: sonarqube-check
@@ -41,6 +39,7 @@ sonarqube-check:
   only:
     - merge_requests
     - main
+    - develop
 
 
 
