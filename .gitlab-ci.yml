@@ -51,7 +51,7 @@ deploy:
     - docker:dind
     #Docker-in-docker
   script:
-    - /gradlew assemble
+    - ./gradlew assemble
     - ls build/libs
     - docker build -t travel-temptation-backend .
     - |
