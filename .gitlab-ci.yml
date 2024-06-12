@@ -25,7 +25,7 @@ test:
     - ./gradlew test
   only:
     - main
-      
+
 sonarqube-check:
   stage: sonarqube-check
   image: gradle:8.2.0-jdk17-jammy
@@ -51,6 +51,7 @@ deploy:
     - docker:dind
     #Docker-in-docker
   script:
+    - ls build/libs
     - docker build -t travel-temptation-backend .
     - |
       if (docker ps -q -f name=travel-temptation-backend-staging) {
