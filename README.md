@@ -1,8 +1,6 @@
 # Travel temptation
 
 ## Docker instructions
-
-
 docker build -t travel-temptation-backend .
 
 docker stop travel-temptation-backend-staging

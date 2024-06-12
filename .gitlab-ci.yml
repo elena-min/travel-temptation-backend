@@ -11,6 +11,7 @@ stages:
   - test
   - integration_test
   - sonarqube-check
+  - deploy
 
 build:
   stage: build
@@ -38,4 +39,20 @@ sonarqube-check:
     - merge_requests
     - main
     - develop
+
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+    #Docker-in-docker
+  script:
+    - docker build -t travel-temptation-backend .
+    - docker stop travel-temptation-backend-staging || true
+    - docker rm travel-temptation-backend-staging || true
+    - docker run -d -p 8090:8080 --net=travel_temptation_network_staging --env spring_profiles_active=staging --name=travel-temptation-backend-staging travel-temptation-backend
+  only:
+    - main
+    - develoop
 
