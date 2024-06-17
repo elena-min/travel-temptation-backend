@@ -72,11 +72,7 @@ public class TrendingService {
     private boolean isBeforeSixMonthsFromToday(Date date) {
         LocalDate today = LocalDate.now();
         LocalDate sixMonthsFromToday = today.plusMonths(6);
-
-        // Convert java.sql.Date to java.util.Date
         Date utilDate = new Date(date.getTime());
-
-        // Convert java.util.Date to LocalDate
         LocalDate dateToCheck = utilDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         return dateToCheck.isBefore(sixMonthsFromToday);

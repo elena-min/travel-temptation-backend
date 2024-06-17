@@ -10,6 +10,8 @@ import org.individualproject.persistence.UserRepository;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -20,17 +22,26 @@ public class LoginService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AccessTokenEncoder accessTokenEncoder;
+    private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 
     public LoginRegisterResponse login(LoginRequest loginRequest){
-        UserEntity userEntity = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(InvalidCredentialsException::new);
+        try {
+            UserEntity userEntity = userRepository.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(InvalidCredentialsException::new);
 
-        if(!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getHashedPassword())){
-            throw new InvalidCredentialsException();
+            if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getHashedPassword())) {
+                throw new InvalidCredentialsException();
+            }
+
+            String accessToken = generateAccessToken(userEntity);
+            return LoginRegisterResponse.builder().accessToken(accessToken).build();
+
+        } catch (InvalidCredentialsException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            logger.error("Unexpected error during login: {}", ex.getMessage(), ex);
+            throw new RuntimeException("An unexpected error occurred during login. Please try again later.");
         }
-
-        String accessToken = generateAccessToken(userEntity);
-        return LoginRegisterResponse.builder().accessToken(accessToken).build();
 
     }
 

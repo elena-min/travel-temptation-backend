@@ -1,11 +1,9 @@
 package org.individualproject.business;
 
 import lombok.AllArgsConstructor;
-import org.individualproject.business.converter.BookingConverter;
 import org.individualproject.business.converter.PaymentDetailsConverter;
 import org.individualproject.business.converter.UserConverter;
 import org.individualproject.business.exception.InvalidExcursionDataException;
-import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
@@ -13,8 +11,6 @@ import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.PaymentDetailsRepository;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
 import org.individualproject.persistence.entity.UserEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

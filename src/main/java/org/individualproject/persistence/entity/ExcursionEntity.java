@@ -27,6 +27,7 @@ public class ExcursionEntity {
     private String name;
 
     @NotBlank
+    @Lob
     @Length(min = 2)
     @Column(name = "description")
     private String description;
@@ -58,5 +59,8 @@ public class ExcursionEntity {
     @NotNull
     @Column(name = "numberOfSpacesLeft")
     private int numberOfSpacesLeft;
+
+    @Column(name = "file_name")
+    private String fileName;
 
 }

@@ -88,7 +88,7 @@ public class UserService {
     }
 
     public boolean updateUser(UpdateUserRequest request) {
-        if (requestAccessToken.getUserID() != request.getId()) {
+        if (!requestAccessToken.getUserID().equals(request.getId())) {
             throw new UnauthorizedDataAccessException("USER_ID_NOT_FROM_LOGGED_IN_USER");
         }
 

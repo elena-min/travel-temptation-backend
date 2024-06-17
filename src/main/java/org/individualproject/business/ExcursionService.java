@@ -102,6 +102,17 @@ public class ExcursionService {
             if (!requestAccessToken.getUserID().equals(existingExcursion.getTravelAgency().getId())) {
                 throw new UnauthorizedDataAccessException("EXCURSION_NOT_OWNED_BY_LOGGED_IN_USER");
             }
+            int bookedSpaces = existingExcursion.getNumberOfAvaliableSpaces() - existingExcursion.getNumberOfSpacesLeft();
+
+            int newAvailableSpaces = request.getNumberOfAvaliableSpaces();
+            int newSpacesLeft = existingExcursion.getNumberOfSpacesLeft();
+
+            if (newAvailableSpaces < newSpacesLeft) {
+                newSpacesLeft = newAvailableSpaces - bookedSpaces;
+                if (newSpacesLeft < 0) {
+                    newSpacesLeft = 0;
+                }
+            }
 
             existingExcursion.setName(request.getName());
             List<String> destinations = request.getDestinations();
@@ -111,7 +122,8 @@ public class ExcursionService {
             existingExcursion.setStartDate(request.getStartDate());
             existingExcursion.setEndDate(request.getEndDate());
             existingExcursion.setPrice(request.getPrice());
-            existingExcursion.setNumberOfAvaliableSpaces(request.getNumberOfAvaliableSpaces());
+            existingExcursion.setNumberOfAvaliableSpaces(newAvailableSpaces);
+            existingExcursion.setNumberOfSpacesLeft(newSpacesLeft);
             excursionRepository.save(existingExcursion);
             return true;
         } else {
@@ -173,5 +185,12 @@ public class ExcursionService {
                     )
             );
         }
+    }
+
+    public void updateExcursionPresentationFile(Long excursionId, String fileName) {
+        ExcursionEntity excursion = excursionRepository.findById(excursionId)
+                .orElseThrow(() -> new RuntimeException("Excursion not found with id: " + excursionId));
+        excursion.setFileName(fileName);
+        excursionRepository.save(excursion);
     }
 }

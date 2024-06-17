@@ -23,6 +23,7 @@ public class ExcursionConverter {
                 .price(excursionEntity.getPrice())
                 .numberOfAvaliableSpaces(excursionEntity.getNumberOfAvaliableSpaces())
                 .numberOfSpacesLeft(excursionEntity.getNumberOfSpacesLeft())
+                .fileName(excursionEntity.getFileName())
                 .build();
     }
     public static List<Excursion> mapToDomainList(List<ExcursionEntity> excursionEntities) {
@@ -45,6 +46,7 @@ public class ExcursionConverter {
                 .price(excursion.getPrice())
                 .numberOfAvaliableSpaces(excursion.getNumberOfAvaliableSpaces())
                 .numberOfSpacesLeft(excursion.getNumberOfSpacesLeft())
+                .fileName(excursion.getFileName())
                 .build();
     }
 

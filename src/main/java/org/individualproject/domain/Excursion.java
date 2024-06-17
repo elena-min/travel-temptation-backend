@@ -22,4 +22,6 @@ public class Excursion {
     private int numberOfAvaliableSpaces;
     private int numberOfSpacesLeft;
 
+    private String fileName;
+
 }
