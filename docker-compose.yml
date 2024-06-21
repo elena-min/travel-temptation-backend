@@ -1,4 +1,4 @@
-version: '3';
+version: '3'
 
 services:
   backend:
@@ -29,3 +29,6 @@ services:
 networks:
   travel_temptation_network_staging:
     external: true
+
+volumes:
+  gamehub-db-data:
