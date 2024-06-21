@@ -31,4 +31,4 @@ networks:
     external: true
 
 volumes:
-  gamehub-db-data:
+  travel_temptation-db-data:
