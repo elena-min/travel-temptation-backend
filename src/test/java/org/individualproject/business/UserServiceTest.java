@@ -49,6 +49,9 @@ class UserServiceTest {
     private PaymentDetailsRepository paymentDetailsRepository;
 
     @Mock
+    private NotificationsRepository notificationsRepository;
+
+    @Mock
     private AccessToken accessToken;
 
     @InjectMocks
@@ -222,7 +225,8 @@ class UserServiceTest {
         doNothing().when(bookingRepository).deleteByUser(userEntity);
         doNothing().when(paymentDetailsRepository).deleteByUser(userEntity);
         doNothing().when(excursionRepository).deleteByTravelAgency(userEntity);
-        doNothing().when(userRepository).deleteById(id); // This is already mocked
+        doNothing().when(userRepository).deleteById(id);
+        doNothing().when(notificationsRepository).deleteByUserId(userEntity.getId());
 
         // Act
         boolean result = userService.deleteUser(id);
@@ -235,6 +239,7 @@ class UserServiceTest {
         verify(bookingRepository, times(1)).deleteByUser(userEntity);
         verify(paymentDetailsRepository, times(1)).deleteByUser(userEntity);
         verify(excursionRepository, times(1)).deleteByTravelAgency(userEntity);
+        verify(notificationsRepository, times(1)).deleteByUserId(userEntity.getId());
     }
     @Test
     void deleteUser_nonExistingUser(){

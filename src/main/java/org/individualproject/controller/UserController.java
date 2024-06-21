@@ -4,6 +4,8 @@ package org.individualproject.controller;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.individualproject.business.BookingService;
+import org.individualproject.business.ReviewService;
 import org.individualproject.business.UserService;
 import org.individualproject.business.exception.NotFoundException;
 import org.individualproject.domain.*;
@@ -18,9 +20,13 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
+    private ReviewService reviewService;
+    private BookingService bookingService;
 
-    public UserController(UserService uService){
+    public UserController(UserService uService, ReviewService rService, BookingService bService){
         this.userService = uService;
+        this.reviewService = rService;
+        this.bookingService = bService;
     }
 
     @GetMapping("/{id}")
@@ -64,7 +70,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @RolesAllowed({"USER"})
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
     public ResponseEntity<Long> deleteUser(@PathVariable(value = "id")@NotNull final Long id)
     {
         if (userService.deleteUser(id)) {
@@ -80,5 +86,57 @@ public class UserController {
         request.setId(id);
         userService.updateUser(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{userId}/reviews")
+    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable(value = "userId")@NotNull final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if (userOptional.isEmpty()) {
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Review> reviews = reviewService.getReviewsByUser(user);
+        return ResponseEntity.ok().body(reviews);
+    }
+
+    @GetMapping("/{userId}/bookings")
+    @RolesAllowed({"USER"})
+    public ResponseEntity<List<Booking>> getBookingsByUser(@PathVariable(value = "userId") final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if(userOptional.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Booking> bookings = bookingService.getBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
+    }
+
+    @GetMapping("/{userId}/past-bookings")
+    @RolesAllowed({"USER"})
+    public ResponseEntity<List<Booking>> getPastBookingsByUser(@PathVariable(value = "userId") final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if(userOptional.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Booking> bookings = bookingService.getPastBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
+    }
+
+
+    @GetMapping("/{userId}/future-bookings")
+    @RolesAllowed({"USER"})
+    public ResponseEntity<List<Booking>> getFutureBookingsByUser(@PathVariable(value = "userId") final Long userId)
+    {
+        Optional<User> userOptional = userService.getUser(userId);
+        if(userOptional.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+        User user = userOptional.get();
+        List<Booking> bookings = bookingService.getFutureBookingsByUser(user);
+        return ResponseEntity.ok().body(bookings);
     }
 }

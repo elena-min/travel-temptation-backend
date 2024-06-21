@@ -13,9 +13,12 @@ import org.individualproject.domain.User;
 import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
+import org.individualproject.persistence.PaymentDetailsRepository;
+import org.individualproject.persistence.entity.BookingEntity;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +28,7 @@ import java.util.Optional;
 public class ExcursionService {
     private ExcursionRepository excursionRepository;
     private BookingRepository bookingRepository;
+    private PaymentDetailsRepository paymentDetailsRepository;
     private AccessToken requestAccessToken;
     public List<Excursion> getExcursions() {
         List<ExcursionEntity> excursionEntities = excursionRepository.findAll();
@@ -63,6 +67,7 @@ public class ExcursionService {
         return ExcursionConverter.mapToDomain(excursionEntity);
     }
 
+    @Transactional
     public boolean deleteExcursion(Long id) {
         Optional<ExcursionEntity> optionalExcursion = excursionRepository.findById(id);
 
@@ -76,7 +81,12 @@ public class ExcursionService {
                 throw new UnauthorizedDataAccessException("EXCURSION_NOT_OWNED_BY_LOGGED_IN_USER");
             }
 
+            List<BookingEntity> bookings = bookingRepository.findByExcursion(excursion);
+
             bookingRepository.deleteByExcursion(excursion);
+            for (BookingEntity booking : bookings) {
+                paymentDetailsRepository.deleteById(booking.getBankingDetails().getId());
+            }
             excursionRepository.deleteById(id);
             return true;
         } else {

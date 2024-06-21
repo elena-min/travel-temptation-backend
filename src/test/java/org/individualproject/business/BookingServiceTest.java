@@ -14,6 +14,7 @@ import org.individualproject.domain.enums.Gender;
 import org.individualproject.domain.enums.UserRole;
 import org.individualproject.persistence.BookingRepository;
 import org.individualproject.persistence.ExcursionRepository;
+import org.individualproject.persistence.PaymentDetailsRepository;
 import org.individualproject.persistence.entity.BookingEntity;
 import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
@@ -51,6 +52,8 @@ class BookingServiceTest {
     @Mock
     private ExcursionRepository excursionRepository;
 
+    @Mock
+    PaymentDetailsRepository paymentDetailsRepository;
     @InjectMocks
     private BookingService bookingService;
 
@@ -237,6 +240,7 @@ class BookingServiceTest {
         assertTrue(result);
         verify(bookingRepository, times(1)).findById(1L);
         verify(bookingRepository, times(1)).deleteById(1L);
+        verify(paymentDetailsRepository, times(1)).deleteById(1L);
     }
 
     @Test

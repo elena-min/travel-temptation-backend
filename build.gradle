@@ -10,7 +10,6 @@ group = 'org.example'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '17'
 
-
 sonar {
     properties {
         property "sonar.java.coveragePlugin", "jacoco"
@@ -62,6 +61,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
     //testImplementation 'com.playtika.testcontainers:embedded-mysql:3.0.0-RC9'
 }
 
@@ -81,30 +81,29 @@ tasks.named('sonar').configure {
 sourceSets {
     test {
         java {
-            srcDirs = ['src/test/java']
+            srcDirs = ['src/test/java/org/individualproject']
         }
     }
 }
 
-
 // Separate source set for integration tests (optional)
-//sourceSets {
- //   integrationTest {
- //       java {
- //           srcDirs = ['src/test/java/org/individualproject/controller']
- //       }
- //       resources {
- //           srcDirs = ['src/main/resources']
- //       }
- //       compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
- //       runtimeClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
- //   }
-//}
 
-//configurations {
-//    integrationTestImplementation.extendsFrom testImplementation
-//    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-//}
+sourceSets {
+    integrationTest {
+        java {
+            srcDirs = ['src/test/java/org/individualproject/controller']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+    }
+}
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
 
 // Register the integrationTest task
 //tasks.register('integrationTest', Test) {

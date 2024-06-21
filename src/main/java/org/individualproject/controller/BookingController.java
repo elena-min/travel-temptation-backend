@@ -4,13 +4,10 @@ package org.individualproject.controller;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.individualproject.business.BookingService;
-import org.individualproject.business.ExcursionService;
-import org.individualproject.business.UserService;
 import org.individualproject.business.exception.InvalidExcursionDataException;
 import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.domain.*;
 import org.individualproject.domain.enums.BookingStatus;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +21,8 @@ import java.util.Optional;
 public class BookingController {
 
     private BookingService bookingService;
-    private UserService userService;
-    private ExcursionService excursionService;
-    public BookingController(BookingService bService, UserService uService, ExcursionService eService){
+    public BookingController(BookingService bService){
         this.bookingService = bService;
-        this.userService = uService;
-        this.excursionService = eService;
     }
 
     @GetMapping("/{id}")
@@ -89,58 +82,18 @@ public class BookingController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/user/{userId}")
-    @RolesAllowed({"USER"})
-    public ResponseEntity<List<Booking>> getBookingsByUser(@PathVariable(value = "userId") final Long userId)
-    {
-        Optional<User> userOptional = userService.getUser(userId);
-        if(userOptional.isEmpty()){
-            return  ResponseEntity.notFound().build();
-        }
-        User user = userOptional.get();
-        List<Booking> bookings = bookingService.getBookingsByUser(user);
-        return ResponseEntity.ok().body(bookings);
-    }
-
-    @GetMapping("/past/{userId}")
-    @RolesAllowed({"USER"})
-    public ResponseEntity<List<Booking>> getPastBookingsByUser(@PathVariable(value = "userId") final Long userId)
-    {
-        Optional<User> userOptional = userService.getUser(userId);
-        if(userOptional.isEmpty()){
-            return  ResponseEntity.notFound().build();
-        }
-        User user = userOptional.get();
-        List<Booking> bookings = bookingService.getPastBookingsByUser(user);
-        return ResponseEntity.ok().body(bookings);
-    }
-
-
-    @GetMapping("/future/{userId}")
-    @RolesAllowed({"USER"})
-    public ResponseEntity<List<Booking>> getFutureBookingsByUser(@PathVariable(value = "userId") final Long userId)
-    {
-        Optional<User> userOptional = userService.getUser(userId);
-        if(userOptional.isEmpty()){
-            return  ResponseEntity.notFound().build();
-        }
-        User user = userOptional.get();
-        List<Booking> bookings = bookingService.getFutureBookingsByUser(user);
-        return ResponseEntity.ok().body(bookings);
-    }
-
-    @GetMapping("/excursion/{excursionId}")
-    @RolesAllowed({"TRAVELAGENCY"})
-    public ResponseEntity<List<Booking>> getBookingsByExcursion(@PathVariable(value = "excursionId") final Long excursionId)
-    {
-        Optional<Excursion> excursionOptional = excursionService.getExcursion(excursionId);
-        if(excursionOptional.isEmpty()){
-            return  ResponseEntity.notFound().build();
-        }
-        Excursion excursion = excursionOptional.get();
-        List<Booking> bookings = bookingService.getBookingsByExcursion(excursion);
-        return ResponseEntity.ok().body(bookings);
-    }
+//    @GetMapping("/excursion/{excursionId}")
+//    @RolesAllowed({"TRAVELAGENCY"})
+//    public ResponseEntity<List<Booking>> getBookingsByExcursion(@PathVariable(value = "excursionId") final Long excursionId)
+//    {
+//        Optional<Excursion> excursionOptional = excursionService.getExcursion(excursionId);
+//        if(excursionOptional.isEmpty()){
+//            return  ResponseEntity.notFound().build();
+//        }
+//        Excursion excursion = excursionOptional.get();
+//        List<Booking> bookings = bookingService.getBookingsByExcursion(excursion);
+//        return ResponseEntity.ok().body(bookings);
+//    }
 
     @GetMapping("/total-sales-last-quarter")
     @RolesAllowed({"TRAVELAGENCY"})
@@ -152,31 +105,31 @@ public class BookingController {
         return ResponseEntity.ok().body(totalSales);
     }
 
-    @GetMapping("/total-sales-last-quarter/{excursionId}")
-    @RolesAllowed({"TRAVELAGENCY"})
-    public ResponseEntity<Double> getTotalSalesLastQuarterPerExcursion(
-                                                              @PathVariable Long excursionId,
-                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-                                                              @RequestParam(value = "status") BookingStatus status){
-        Double totalSales = bookingService.getTotalSalesInLastQuarterForExcursion(excursionId, startDate, endDate, status);
-        return ResponseEntity.ok().body(totalSales);
-    }
+//    @GetMapping("/total-sales-last-quarter/{excursionId}")
+//    @RolesAllowed({"TRAVELAGENCY"})
+//    public ResponseEntity<Double> getTotalSalesLastQuarterPerExcursion(
+//                                                              @PathVariable Long excursionId,
+//                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+//                                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+//                                                              @RequestParam(value = "status") BookingStatus status){
+//        Double totalSales = bookingService.getTotalSalesInLastQuarterForExcursion(excursionId, startDate, endDate, status);
+//        return ResponseEntity.ok().body(totalSales);
+//    }
 
-    @GetMapping("/weekly-statistics/{excursionId}")
-    @RolesAllowed({"TRAVELAGENCY"})
-    public ResponseEntity<List<WeeklyStatisticsDTO>> getWeeklyStatistics(@PathVariable Long excursionId, @RequestParam(value = "status") BookingStatus status){
-        List<WeeklyStatisticsDTO> weeklyStatistics = bookingService.getWeeklyStatistics(excursionId, status);
-        return ResponseEntity.ok().body(weeklyStatistics);
-    }
-
-    @GetMapping("/booking-statistics/{excursionId}")
-    @RolesAllowed({"TRAVELAGENCY"})
-    public ResponseEntity<List<BookingDataDTO>> getBookingDataByDateRangePerExcursion(@PathVariable Long excursionId,
-                                                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){
-        List<BookingDataDTO> bookingDataDTOS = bookingService.getBookingDataByDateRangePerExcursion(excursionId, startDate, endDate);
-        return ResponseEntity.ok().body(bookingDataDTOS);
-    }
+//    @GetMapping("/weekly-statistics/{excursionId}")
+//    @RolesAllowed({"TRAVELAGENCY"})
+//    public ResponseEntity<List<WeeklyStatisticsDTO>> getWeeklyStatistics(@PathVariable Long excursionId, @RequestParam(value = "status") BookingStatus status){
+//        List<WeeklyStatisticsDTO> weeklyStatistics = bookingService.getWeeklyStatistics(excursionId, status);
+//        return ResponseEntity.ok().body(weeklyStatistics);
+//    }
+//
+//    @GetMapping("/booking-statistics/{excursionId}")
+//    @RolesAllowed({"TRAVELAGENCY"})
+//    public ResponseEntity<List<BookingDataDTO>> getBookingDataByDateRangePerExcursion(@PathVariable Long excursionId,
+//                                                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+//                                                                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){
+//        List<BookingDataDTO> bookingDataDTOS = bookingService.getBookingDataByDateRangePerExcursion(excursionId, startDate, endDate);
+//        return ResponseEntity.ok().body(bookingDataDTOS);
+//    }
 
 }

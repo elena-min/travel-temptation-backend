@@ -63,19 +63,19 @@ public class ReviewController {
         }
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable(value = "userId")@NotNull final Long userId)
-    {
-        Optional<User> userOptional = userService.getUser(userId);
-        if (userOptional.isEmpty()) {
-            return  ResponseEntity.notFound().build();
-        }
-        User user = userOptional.get();
-        List<Review> reviews = reviewService.getReviewsByUser(user);
-        return ResponseEntity.ok().body(reviews);
-    }
+//    @GetMapping("/user/{userId}")
+//    public ResponseEntity<List<Review>> getReviewsByUser(@PathVariable(value = "userId")@NotNull final Long userId)
+//    {
+//        Optional<User> userOptional = userService.getUser(userId);
+//        if (userOptional.isEmpty()) {
+//            return  ResponseEntity.notFound().build();
+//        }
+//        User user = userOptional.get();
+//        List<Review> reviews = reviewService.getReviewsByUser(user);
+//        return ResponseEntity.ok().body(reviews);
+//    }
 
-    @GetMapping("/travelagency/{travelAgencyId}")
+    @GetMapping("/travel-agency/{travelAgencyId}")
     public ResponseEntity<List<Review>> getReviewsByTravelAgency(@PathVariable(value = "travelAgencyId")@NotNull final Long travelAgencyId)
     {
         Optional<User> userOptional = userService.getUser(travelAgencyId);

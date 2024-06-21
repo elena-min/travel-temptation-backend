@@ -39,7 +39,7 @@ public class ChatController {
         return ResponseEntity.ok().body(messages);
     }
 
-    @GetMapping("/chat/{fromUserId}/{toUserId}/messages")
+    @GetMapping("/chats/{fromUserId}/{toUserId}/messages")
     public ResponseEntity<List<NotificationMessage>> getChatMessages(
             @PathVariable @NotNull Long fromUserId,
             @PathVariable @NotNull Long toUserId) {

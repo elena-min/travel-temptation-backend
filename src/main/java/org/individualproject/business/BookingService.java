@@ -110,8 +110,12 @@ public class BookingService {
                 if (timeDiff < twoWeeksInMillis) {
                     throw new IllegalStateException("Cannot cancel trip. Cancellation period has passed.");
                 } else {
-                    //paymentDetailsRepository.deleteById(booking.getBankingDetails().getId());
+                    ExcursionEntity excursion = booking.getExcursion();
+                    excursion.setNumberOfSpacesLeft(excursion.getNumberOfSpacesLeft() + booking.getNumberOfTravelers());
+                    excursionRepository.save(excursion);
+
                     bookingRepository.deleteById(id);
+                    paymentDetailsRepository.deleteById(booking.getBankingDetails().getId());
                     return true;
                 }
 

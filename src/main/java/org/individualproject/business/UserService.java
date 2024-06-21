@@ -7,9 +7,11 @@ import org.individualproject.business.exception.UnauthorizedDataAccessException;
 import org.individualproject.configuration.security.token.AccessToken;
 import org.individualproject.domain.*;
 import org.individualproject.persistence.*;
+import org.individualproject.persistence.entity.BookingEntity;
 import org.individualproject.persistence.entity.UserEntity;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +27,7 @@ public class UserService {
     private BookingRepository bookingRepository;
     private PaymentDetailsRepository paymentDetailsRepository;
     private ExcursionRepository excursionRepository;
+    private NotificationsRepository notificationsRepository;
     private AccessToken requestAccessToken;
    public List<User> getUsers() {
         List<UserEntity> userEntities = userRepository.findAll();
@@ -63,6 +66,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public boolean deleteUser(Long id) {
         try {
             if (!Objects.equals(requestAccessToken.getUserID(), id)) {
@@ -72,10 +76,12 @@ public class UserService {
 
             if(user.isPresent()){
                 UserEntity userEntity = user.get();
+                notificationsRepository.deleteByUserId(userEntity.getId());
                 reviewRepository.deleteByUserWriter(userEntity);
                 reviewRepository.deleteByTravelAgency(userEntity);
                 bookingRepository.deleteByUser(userEntity);
                 paymentDetailsRepository.deleteByUser(userEntity);
+
                 excursionRepository.deleteByTravelAgency(userEntity);
 
                 userRepository.deleteById(id);
