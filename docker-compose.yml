@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: travel_temptation_backend_staging
     ports:
        - "8090:8080"
     environment:
@@ -16,6 +17,7 @@ services:
 
   travel_temptation_db_staging:
     image: mysql:latest
+    container_name: travel_temptation_db_staging
     environment:
       MYSQL_ROOT_PASSWORD: my-secret-pw-staging
       MYSQL_DATABASE: travel_temptation_db
