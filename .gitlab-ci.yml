@@ -49,6 +49,10 @@ deploy:
   script:
     - ./gradlew assemble
     - ls build/libs
+    - docker stop travel_temptation_backend_staging || true
+    - docker rm travel_temptation_backend_staging || true
+    - docker stop travel_temptation_db_staging || true
+    - docker rm travel_temptation_db_staging || true
     - docker-compose -f docker-compose.yml up -d --build
 
   only:
