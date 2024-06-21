@@ -51,7 +51,7 @@ deploy:
   script:
     - ./gradlew assemble
     - ls build/libs
-    - docker stop travel-temptation_backend-staging
+    - docker stop travel-temptation-backend-staging
     - docker rm travel-temptation-backend-staging
     - docker stop travel_temptation_db_staging
     - docker rm travel_temptation_db_staging
