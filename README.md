@@ -18,3 +18,6 @@ docker run -d -p 8090:8080 --net=travel_temptation_network_staging --env spring_
     - docker stop travel-temptation-backend-staging
     - docker rm travel-temptation-backend-staging
     - docker run -d -p 8090:8080 --net=travel_temptation_network_staging --env spring_profiles_active=staging --name=travel-temptation-backend-staging travel-temptation-backend
+
+
+ALTER TABLE `user` MODIFY COLUMN `password` VARCHAR(255) DEFAULT '';
