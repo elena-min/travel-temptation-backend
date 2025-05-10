@@ -6,9 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.individualproject.domain.Excursion;
-import org.individualproject.domain.PaymentDetails;
-import org.individualproject.domain.User;
 import org.individualproject.domain.enums.BookingStatus;
 
 import java.time.LocalDateTime;
@@ -18,10 +15,12 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "booking")
+@Table(name = "bookings")
 public class BookingEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne

@@ -9,7 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Data
 @NoArgsConstructor
@@ -20,17 +20,17 @@ public class UpdatePaymentDetailsRequest {
 
     private User user;
 
-    @NotBlank
+    @NotBlank(message = "Card number cannot be blank")
     @Pattern(regexp = "\\d{16}", message = "Card number must be 16 digits")
     private String cardNumber;
 
-    @NotBlank
+    @NotBlank(message = "Cvv cannot be blank")
     @Size(min = 3, message = "CVV must be between 3 and 4 digits")
     private String cvv;
 
-    @NotNull
-    private LocalDate expirationDate;
+    @NotNull(message = "Expiration date cannot be null")
+    private YearMonth expirationDate;
 
-    @NotBlank
+    @NotBlank(message = "Card Holder cannot be blank")
     private String cardHolderName;
 }

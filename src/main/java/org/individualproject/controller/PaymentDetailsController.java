@@ -1,6 +1,8 @@
 package org.individualproject.controller;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.individualproject.business.PaymentDetailsService;
 import org.individualproject.domain.*;
 import org.springframework.http.HttpStatus;
@@ -20,13 +22,15 @@ public class PaymentDetailsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentDetails> getPaymentDetails(@PathVariable(value = "id") final Long id)
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
+    public ResponseEntity<PaymentDetails> getPaymentDetails(@PathVariable(value = "id")@NotNull final Long id)
     {
         final Optional<PaymentDetails> paymentDetailsOptional = paymentDetailsService.getPaymentDetails(id);
         return paymentDetailsOptional.map(booking -> ResponseEntity.ok().body(booking))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping()
+    @RolesAllowed({"TRAVELAGENCY"})
     public ResponseEntity<List<PaymentDetails>> getAllPaymentDetails()
     {
         List<PaymentDetails> paymentDetails = paymentDetailsService.getAllPaymentDetails();
@@ -34,13 +38,15 @@ public class PaymentDetailsController {
     }
 
     @PostMapping()
-    public ResponseEntity<PaymentDetails> createv(@RequestBody @Valid CreatePaymentDetailsRequest request) {
+    @RolesAllowed({"USER"})
+    public ResponseEntity<PaymentDetails> create(@RequestBody @Valid CreatePaymentDetailsRequest request) {
         PaymentDetails response = paymentDetailsService.createPaymentDetails(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Long> deletePaymentDetails(@PathVariable(value = "id") final Long id)
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
+    public ResponseEntity<Long> deletePaymentDetails(@PathVariable(value = "id")@NotNull final Long id)
     {
         if (paymentDetailsService.deletePaymentDetails(id)) {
             return ResponseEntity.ok().build();
@@ -49,7 +55,8 @@ public class PaymentDetailsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updatePaymentDetails(@PathVariable(value = "id") final long id, @RequestBody @Valid UpdatePaymentDetailsRequest request){
+    @RolesAllowed({"USER", "TRAVELAGENCY"})
+    public ResponseEntity<Void> updatePaymentDetails(@PathVariable(value = "id")@NotNull final long id, @RequestBody @Valid UpdatePaymentDetailsRequest request){
 
         request.setId(id);
         paymentDetailsService.updatePaymentDetails(request);

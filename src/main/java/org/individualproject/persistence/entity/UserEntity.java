@@ -10,14 +10,14 @@ import org.hibernate.validator.constraints.Length;
 import org.individualproject.domain.enums.Gender;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "user")
+@Table(name = "`user`")
 public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,19 +43,19 @@ public class UserEntity {
     private String email;
 
     @NotBlank
-    @Length(min = 6)
-    @Column(name = "password")
-    private String password;
+    @Length(min = 2, max = 20)
+    @Column(name = "username")
+    private String username;
 
     @NotBlank
     @Column(name = "hashedPassword")
     private String hashedPassword;
 
-    @NotBlank
-    @Column(name = "salt")
-    private String salt;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private Gender gender;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private Set<UserRoleEntity> userRoles;
 }

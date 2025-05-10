@@ -5,12 +5,10 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.internal.util.privilegedactions.LoadClass;
 import org.individualproject.domain.enums.Gender;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -18,17 +16,17 @@ import java.util.Date;
 public class UpdateUserRequest {
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "First name cannot be null")
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "Last name cannot be null")
     private String lastName;
 
-    @NotNull
+    @NotNull(message = "Birth date cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Past
+    @Past(message = "Birth date must be in the past")
     private LocalDate birthDate;
 
-    @NotNull
+    @NotNull(message = "Gender cannot be null")
     private Gender gender;
 }

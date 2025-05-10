@@ -14,10 +14,14 @@ public class Excursion {
     private Long id;
     private String name;
     private List<String> destinations;
+    private String description;
     private Date startDate;
     private Date endDate;
-    private String travelAgency;
+    private User travelAgency;
     private double price;
     private int numberOfAvaliableSpaces;
+    private int numberOfSpacesLeft;
+
+    private String fileName;
 
 }

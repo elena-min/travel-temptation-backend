@@ -1,8 +1,36 @@
-version: '3';
+version: '3'
 
-  services:
-    backend:
-      build:
-        dockerfile: Dockerfile
-      ports:
-        - "8080:8080"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: travel_temptation_backend_staging
+    ports:
+       - "8090:8080"
+    environment:
+       SPRING_PROFILES_ACTIVE: staging
+    depends_on:
+       - travel_temptation_db_staging
+    networks:
+      - travel_temptation_network_staging
+
+  travel_temptation_db_staging:
+    image: mysql:latest
+    container_name: travel_temptation_db_staging
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw-staging
+      MYSQL_DATABASE: travel_temptation_db
+    ports:
+      - "3369:3306"
+    networks:
+      - travel_temptation_network_staging
+    volumes:
+      - travel_temptation-db-data:/var/lib/mysql
+
+networks:
+  travel_temptation_network_staging:
+    external: true
+
+volumes:
+  travel_temptation-db-data:

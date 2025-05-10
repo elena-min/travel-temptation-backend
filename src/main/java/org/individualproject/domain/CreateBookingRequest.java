@@ -1,6 +1,5 @@
 package org.individualproject.domain;
 
-import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -15,24 +14,24 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CreateBookingRequest {
-    @NotNull
+    @NotNull(message = "User cannot be null")
     private User user;
 
-    @NotNull
+    @NotNull(message = "Excursion cannot be null")
     private  Excursion excursion;
 
-    @NotNull
+    @NotNull(message = "Booking time cannot be null")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Future
     private LocalDateTime bookingTime;
 
-    @NotNull
+    @NotNull(message = "Status cannot be null")
     private BookingStatus status;
 
-    @NotNull
+    @NotNull(message = "Payment details cannot be null")
     private PaymentDetails bankingDetails;
 
-    @Min(0)
+    @Min(value = 0, message = "Number of travelers must be at least 0")
     private int numberOfTravelers;
 }

@@ -4,8 +4,6 @@ import lombok.*;
 import org.individualproject.domain.enums.Gender;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -18,9 +16,8 @@ public class User {
     private String lastName;
     private LocalDate birthDate;
     private String email;
-    private String password;
+    private String username;
     private String hashedPassword;
-    private String salt;
     private Gender gender;
 
     @Override
@@ -31,9 +28,8 @@ public class User {
                 ", lastName='" + lastName + '\'' +
                 ", birthDate=" + birthDate +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
+                ", username='" + username + '\'' +
                 ", hashedPassword='" + hashedPassword + '\'' +
-                ", salt='" + salt + '\'' +
                 ", gender=" + gender +
                 '}';
     }

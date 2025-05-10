@@ -7,41 +7,48 @@ import org.individualproject.persistence.entity.UserEntity;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ExcursionConverter {
     public static Excursion mapToDomain(ExcursionEntity excursionEntity) {
         List<String> destinations = Arrays.asList(excursionEntity.getDestinations().split(","));
-        Excursion excursion = Excursion.builder()
+        User travelAgency = UserConverter.mapToDomain(excursionEntity.getTravelAgency());
+        return Excursion.builder()
                 .id(excursionEntity.getId())
                 .name(excursionEntity.getName())
                 .destinations(destinations)
+                .description(excursionEntity.getDescription())
                 .startDate(excursionEntity.getStartDate())
                 .endDate(excursionEntity.getEndDate())
-                .travelAgency(excursionEntity.getTravelAgency())
+                .travelAgency(travelAgency)
                 .price(excursionEntity.getPrice())
                 .numberOfAvaliableSpaces(excursionEntity.getNumberOfAvaliableSpaces())
+                .numberOfSpacesLeft(excursionEntity.getNumberOfSpacesLeft())
+                .fileName(excursionEntity.getFileName())
                 .build();
-        return excursion;
     }
     public static List<Excursion> mapToDomainList(List<ExcursionEntity> excursionEntities) {
         return excursionEntities.stream()
                 .map(ExcursionConverter::mapToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public static ExcursionEntity convertToEntity(Excursion excursion){
         String destinationsAsString = String.join(",", excursion.getDestinations());
-        ExcursionEntity excursionEntity = ExcursionEntity.builder()
+        UserEntity travelAgency = UserConverter.convertToEntity(excursion.getTravelAgency());
+        return ExcursionEntity.builder()
                 .id(excursion.getId())
                 .name(excursion.getName())
                 .destinations(destinationsAsString)
+                .description(excursion.getDescription())
                 .startDate(excursion.getStartDate())
                 .endDate(excursion.getEndDate())
-                .travelAgency(excursion.getTravelAgency())
+                .travelAgency(travelAgency)
                 .price(excursion.getPrice())
                 .numberOfAvaliableSpaces(excursion.getNumberOfAvaliableSpaces())
+                .numberOfSpacesLeft(excursion.getNumberOfSpacesLeft())
+                .fileName(excursion.getFileName())
                 .build();
-        return excursionEntity;
     }
+
+    private ExcursionConverter(){}
 }

@@ -5,12 +5,11 @@ import org.individualproject.domain.Excursion;
 import org.individualproject.domain.PaymentDetails;
 import org.individualproject.domain.User;
 import org.individualproject.persistence.entity.BookingEntity;
+import org.individualproject.persistence.entity.ExcursionEntity;
 import org.individualproject.persistence.entity.PaymentDetailsEntity;
+import org.individualproject.persistence.entity.UserEntity;
 
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BookingConverter {
 
@@ -19,7 +18,7 @@ public class BookingConverter {
         Excursion excursion = ExcursionConverter.mapToDomain(bookingEntity.getExcursion());
         PaymentDetails paymentDetails = PaymentDetailsConverter.mapToDomain(bookingEntity.getBankingDetails());
 
-        Booking booking = Booking.builder()
+        return Booking.builder()
                 .id(bookingEntity.getId())
                 .user(user)
                 .excursion(excursion)
@@ -28,11 +27,27 @@ public class BookingConverter {
                 .bankingDetails(paymentDetails)
                 .numberOfTravelers(bookingEntity.getNumberOfTravelers())
                 .build();
-        return booking;
     }
     public static List<Booking> mapToDomainList(List<BookingEntity> bookingEntities) {
         return bookingEntities.stream()
                 .map(BookingConverter::mapToDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
+
+    public static BookingEntity convertToEntity(Booking booking){
+        UserEntity userEntity = UserConverter.convertToEntity(booking.getUser());
+        PaymentDetailsEntity paymentDetailsEntity = PaymentDetailsConverter.convertToEntity(booking.getBankingDetails());
+        ExcursionEntity excursionEntity = ExcursionConverter.convertToEntity(booking.getExcursion());
+        return BookingEntity.builder()
+                .id(booking.getId())
+                .user(userEntity)
+                .bankingDetails(paymentDetailsEntity)
+                .bookingTime(booking.getBookingTime())
+                .excursion(excursionEntity)
+                .numberOfTravelers(booking.getNumberOfTravelers())
+                .status(booking.getStatus())
+                .build();
+    }
+
+    private BookingConverter(){}
 }

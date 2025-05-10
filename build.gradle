@@ -10,16 +10,16 @@ group = 'org.example'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '17'
 
-
 sonar {
     properties {
         property "sonar.java.coveragePlugin", "jacoco"
         property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.projectKey", "Individual-Project"
-        property "sonar.projectName", "Individual Project"
+        property "sonar.projectKey", "Travel-Temptation"
+        property "sonar.projectName", "Travel Temptation"
+        property "sonar.host.url", "http://localhost:9001"
         property "sonar.qualitygate.wait", true
-        property "sonar.token", "sqp_b8ff1b24aa5554863150aa6fdaed35c999d4f986"
-        property "sonar.coverage.exclusions", "**/domain/**, **/configuration/**, **/controller/**"
+        property "sonar.token", "sqp_2e9296119fe9fcabbf7e30760d3d708ec122c4d1"
+        property "sonar.coverage.exclusions", "**/domain/**, **/configuration/**, **/controller/**, **/TravelApplication.java, **/entity/**, **/exception/**"
 
     }
 }
@@ -44,15 +44,24 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-mysql'
-    implementation 'mysql:mysql-connector-java:8.0.33'
+    implementation 'mysql:mysql-connector-java:8.0.26'
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    runtimeOnly 'com.h2database:h2'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.mockito:mockito-core:3.11.2'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.11.2'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+
     //testImplementation 'com.playtika.testcontainers:embedded-mysql:3.0.0-RC9'
 }
 
@@ -62,8 +71,46 @@ tasks.named('test') {
 
 test {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
 }
 
 tasks.named('sonar').configure {
-    dependsOn test
+    dependsOn compileJava, test
 }
+
+sourceSets {
+    test {
+        java {
+            srcDirs = ['src/test/java/org/individualproject']
+        }
+    }
+}
+
+// Separate source set for integration tests (optional)
+
+sourceSets {
+    integrationTest {
+        java {
+            srcDirs = ['src/test/java/org/individualproject/controller']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+        compileClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+        runtimeClasspath += sourceSets.main.output + configurations.testRuntimeClasspath
+    }
+}
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+// Register the integrationTest task
+//tasks.register('integrationTest', Test) {
+//    description = 'Runs integration tests.'
+ //   group = 'verification'
+//    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+//    classpath = sourceSets.integrationTest.runtimeClasspath
+ //   shouldRunAfter test
+//}
+//check.dependsOn integrationTest

@@ -10,16 +10,19 @@ stages:
   - build
   - test
   - sonarqube-check
+  - deploy
 
 build:
   stage: build
   script:
     - ./gradlew assemble
+    - ls build/libs
 
 test:
   stage: test
   script:
     - ./gradlew test
+
 
 sonarqube-check:
   stage: sonarqube-check
@@ -35,7 +38,24 @@ sonarqube-check:
   allow_failure: true
   only:
     - merge_requests
-    - master
     - main
     - develop
+
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+    #Docker-in-docker
+  script:
+    - ./gradlew assemble
+    - ls build/libs
+    - docker stop travel_temptation_backend_staging
+    - docker rm travel_temptation_backend_staging
+    - docker stop travel_temptation_db_staging
+    - docker rm travel_temptation_db_staging
+    - docker-compose -f docker-compose.yml up -d --build
+  only:
+    - main
 
